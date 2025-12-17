@@ -1,15 +1,15 @@
-from .utils.router import classify_intent
-from .utils.paei import compute_paei_weights
+from agents.task_agent import TaskAgent
+from agents.calendar_agent import CalendarAgent
+from agents.research_agent import ResearchAgent
+from agents.browser_agent import BrowserAgent
+from agents.xp_agent import XPAgent
+from agents.report_agent import ReportAgent
+from agents.contact_agent import ContactAgent
+from agents.notification_agent import NotificationAgent
+from agents.energy_agent import EnergyAgent
 
-from .agents.task_agent import TaskAgent
-from .agents.calendar_agent import CalendarAgent
-from .agents.research_agent import ResearchAgent
-from .agents.browser_agent import BrowserAgent
-from .agents.xp_agent import XPAgent
-from .agents.report_agent import ReportAgent
-from .agents.contact_agent import ContactAgent
-from .agents.notification_agent import NotificationAgent
-from .agents.energy_agent import EnergyAgent
+from utils.router import classify_intent
+from utils.paei import compute_paei_weights
 
 
 class ParentAgent:
@@ -23,22 +23,28 @@ class ParentAgent:
             ReportAgent(),
             ContactAgent(),
             NotificationAgent(),
-            EnergyAgent()
+            EnergyAgent(),
         ]
 
     async def handle(self, user_input: str):
-        intent = await classify_intent(user_input)
         results = {}
 
         for agent in self.agents:
             try:
-                results[agent.name] = await agent.run(user_input)
+                output = await agent.run(user_input)
+                results[agent.name] = output
             except Exception as e:
-                results[agent.name] = f"{agent.name} error: {e}"
+                results[agent.name] = {
+                    "agent": agent.name,
+                    "status": "error",
+                    "message": str(e)
+                }
 
-        final_response = compute_paei_weights(user_input, results)
-        return final_response
+        return compute_paei_weights(user_input, results)
 
 
-parent_agent = ParentAgent()
+
+
+
+
 

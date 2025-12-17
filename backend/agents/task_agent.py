@@ -1,19 +1,42 @@
+import os
 import json
-from ..base_agent import BaseAgent
+from base_agent import BaseAgent
+
 
 class TaskAgent(BaseAgent):
     def __init__(self):
-        super().__init__("tasks_db.json", "TaskAgent")
+        super().__init__(
+            name="TaskAgent",
+            db_path="backend/database/tasks_db.json"
+        )
 
-    async def run(self, instruction: str):
+    async def run(self, user_input: str):
+        # Ensure database directory exists
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+
+        # Initialize DB file if missing
+        if not os.path.exists(self.db_path):
+            with open(self.db_path, "w") as f:
+                json.dump([], f)
+
+        # Load existing tasks
         with open(self.db_path, "r") as f:
-            data = json.load(f)
+            tasks = json.load(f)
 
-        task_id = str(len(data) + 1)
-        data[task_id] = {"task": instruction}
+        # Add new task
+        new_task = {"task": user_input}
+        tasks.append(new_task)
 
+        # Save back to DB
         with open(self.db_path, "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(tasks, f, indent=2)
 
-        return f"Task added: {instruction}"
+        return {
+            "agent": self.name,
+            "status": "success",
+            "message": "Task added",
+            "data": new_task
+        }
+
+
 

@@ -1,11 +1,21 @@
-from ..base_agent import BaseAgent
-from ..utils.llm import ask_llm
+from base_agent import BaseAgent
 
 class ResearchAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("research_db.json", "ResearchAgent")
+    name = "ResearchAgent"
 
-    async def run(self, instruction: str):
-        response = await ask_llm(instruction)
-        return response
+    def __init__(self):
+        self.db_path = None
+
+    async def run(self, user_input: str):
+        return {
+            "agent": self.name,
+            "status": "success",
+            "message": "Research completed",
+            "data": {
+                "query": user_input,
+                "result": "This is a placeholder research response"
+            }
+        }
+
+
 

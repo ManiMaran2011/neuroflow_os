@@ -1,19 +1,26 @@
 import json
-from ..base_agent import BaseAgent
+import os
 
-class NotificationAgent(BaseAgent):
+class NotificationAgent:
+    name = "NotificationAgent"
+
     def __init__(self):
-        super().__init__("notifications_db.json", "NotificationAgent")
+        self.db_path = "backend/database/notifications_db.json"
 
-    async def run(self, instruction: str):
-        with open(self.db_path, "r") as f:
-            data = json.load(f)
+    async def run(self, user_input: str):
+        data = {
+            "notification": user_input
+        }
 
-        notif_id = str(len(data) + 1)
-        data[notif_id] = {"notification": instruction}
-
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
         with open(self.db_path, "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f)
 
-        return f"Notification scheduled: {instruction}"
+        return {
+            "agent": self.name,
+            "status": "success",
+            "message": "Notification scheduled",
+            "data": data
+        }
+
 

@@ -1,8 +1,19 @@
-from ..base_agent import BaseAgent
+from base_agent import BaseAgent
 
 class BrowserAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("browser_db.json", "BrowserAgent")
+    name = "BrowserAgent"
 
-    async def run(self, instruction: str):
-        return f"Browser lookup simulated for: {instruction}"
+    def __init__(self):
+        self.db_path = None
+
+    async def run(self, user_input: str):
+        return {
+            "agent": self.name,
+            "status": "success",
+            "message": "Browser lookup simulated",
+            "data": {
+                "query": user_input
+            }
+        }
+
+

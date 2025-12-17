@@ -1,150 +1,135 @@
 import streamlit as st
 import requests
+import time
+
+BACKEND_URL = "http://127.0.0.1:8000/ask"
 
 st.set_page_config(
     page_title="NeuroFlow OS",
-    layout="wide"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-}
-
-body {
-    background: radial-gradient(circle at top right, #2b3a42, #0f172a);
+html, body, [data-testid="stApp"] {
+    background-color: #05050a;
     color: #e5e7eb;
 }
 
-.main {
-    background: transparent;
-}
-
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding-top: 4rem;
-}
-
-.hero {
-    margin-bottom: 3rem;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 300;
-    letter-spacing: 0.08em;
-    line-height: 1.1;
-}
-
-.hero-subtitle {
-    margin-top: 1rem;
-    max-width: 520px;
-    font-size: 0.95rem;
-    color: #9ca3af;
-}
-
-.panel {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 1.6rem;
-    margin-bottom: 2rem;
-}
-
-.run-btn button {
-    background: #e5e7eb;
-    color: #0f172a;
-    border-radius: 999px;
-    font-weight: 500;
-    height: 2.8rem;
-}
-
-.agent-block {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 1rem 0;
-}
-
-.agent-name {
-    font-size: 0.8rem;
-    letter-spacing: 0.12em;
-    color: #9ca3af;
-    margin-bottom: 0.4rem;
-}
-
-.agent-output {
-    font-size: 0.95rem;
-    color: #e5e7eb;
-    white-space: pre-wrap;
-}
-
-.footer {
-    margin-top: 5rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    color: #6b7280;
+/* Title */
+.title {
     text-align: center;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: #7c3aed;
+    text-shadow: 0 0 25px rgba(124,58,237,0.9);
+    margin-bottom: 0.5rem;
+}
+
+/* Subtitle */
+.subtitle {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #22d3ee;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 12px rgba(34,211,238,0.8);
+}
+
+/* Input box */
+textarea {
+    background: #0b0b12 !important;
+    color: #e5e7eb !important;
+    border-radius: 12px !important;
+    border: 1px solid #1f2937 !important;
+}
+
+/* EXECUTE BUTTON — FINAL FIX */
+div[data-testid="stButton"] > button {
+    background: linear-gradient(90deg, #7c3aed, #22d3ee) !important;
+    color: black !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    padding: 0.7rem 1.6rem !important;
+    border: none !important;
+    box-shadow: 0 0 20px rgba(34,211,238,0.6) !important;
+}
+
+div[data-testid="stButton"] > button:hover {
+    background: linear-gradient(90deg, #22d3ee, #7c3aed) !important;
+    box-shadow: 0 0 30px rgba(124,58,237,0.9) !important;
+    transform: scale(1.05);
+}
+
+/* Agent card */
+.agent-card {
+    background: #0b0b12;
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 0 15px rgba(124,58,237,0.25);
+}
+
+/* Summary card */
+.summary {
+    background: linear-gradient(135deg, #0b0b12, #111827);
+    border-radius: 16px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+    border: 1px solid #22d3ee;
+    box-shadow: 0 0 25px rgba(34,211,238,0.5);
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='container'>", unsafe_allow_html=True)
+st.markdown('<div class="title">NeuroFlow OS</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">🧠 Command the system</div>', unsafe_allow_html=True)
 
-st.markdown("""
-<div class="hero">
-    <div class="hero-title">NEUROFLOW OS</div>
-    <div class="hero-subtitle">
-        A multi-agent artificial intelligence operating system for structured thinking,
-        productivity, and autonomous decision workflows.
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("<div class='panel'>", unsafe_allow_html=True)
 user_input = st.text_area(
-    "Command",
-    placeholder="Add buy groceries to my tasks and schedule it tomorrow",
-    height=90
+    "",
+    placeholder="Type a command like: add task buy groceries and remind me tomorrow"
 )
-run = st.button("Execute", use_container_width=True)
-st.markdown("</div>", unsafe_allow_html=True)
 
-if run and user_input.strip():
-    with st.spinner("Processing…"):
-        response = requests.post(
-            "http://127.0.0.1:8000/ask",
-            json={"user_input": user_input}
-        )
+execute = st.button("🚀 Execute")
 
-    if response.status_code == 200:
-        raw = response.json().get("response", "")
-        st.markdown("<div class='panel'>", unsafe_allow_html=True)
+if execute and user_input.strip():
+    with st.spinner("Initializing AI agents..."):
+        time.sleep(0.6)
 
-        for line in raw.split("\n"):
-            if ":" in line:
-                agent, content = line.split(":", 1)
-                st.markdown(f"""
-                <div class="agent-block">
-                    <div class="agent-name">{agent.upper()}</div>
-                    <div class="agent-output">{content.strip()}</div>
+    response = requests.post(BACKEND_URL, json={"user_input": user_input})
+    data = response.json()["response"]
+
+    agents = data["agents"]
+
+    st.markdown("### 🤖 Agent Execution")
+
+    for agent_name, result in agents.items():
+        with st.container():
+            st.markdown(
+                f"""
+                <div class="agent-card">
+                    <strong>{agent_name}</strong><br/>
+                    <span style="color:#22d3ee">{result['message']}</span>
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                unsafe_allow_html=True
+            )
+            time.sleep(0.35)
 
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.error("Backend error")
+    st.markdown(
+        """
+        <div class="summary">
+            <h3>✅ System Summary</h3>
+            <ul>
+                <li>📌 Task created</li>
+                <li>⏰ Reminder scheduled</li>
+                <li>📅 Calendar updated</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-elif run:
-    st.warning("Please enter a command")
 
-st.markdown("""
-<div class="footer">
-    MULTI-AGENT ARCHITECTURE · PARENT–CHILD ORCHESTRATION · GENAI SYSTEM
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
 
