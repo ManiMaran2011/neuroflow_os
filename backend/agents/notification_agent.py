@@ -1,26 +1,18 @@
-import json
-import os
+from utils.telegram import send_telegram_message
 
 class NotificationAgent:
     name = "NotificationAgent"
 
-    def __init__(self):
-        self.db_path = "backend/database/notifications_db.json"
-
     async def run(self, user_input: str):
-        data = {
-            "notification": user_input
-        }
-
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        with open(self.db_path, "w") as f:
-            json.dump(data, f)
+        send_telegram_message(f"⏰ Reminder created: {user_input}")
 
         return {
             "agent": self.name,
             "status": "success",
-            "message": "Notification scheduled",
-            "data": data
+            "message": "Notification sent",
+            "data": {
+                "text": user_input
+            }
         }
 
 

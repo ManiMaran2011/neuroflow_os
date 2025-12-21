@@ -31,5 +31,8 @@
   },
   {
     "event": "Add workout to my task"
+  },
+  {
+    "event": "Add task to buy groceries and remind me tommorow"
   }
 ]

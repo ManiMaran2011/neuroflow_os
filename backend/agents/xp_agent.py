@@ -1,27 +1,42 @@
-from base_agent import BaseAgent
 import json
-import os
+from pathlib import Path
 
-class XPAgent(BaseAgent):
+class XPAgent:
     name = "XPAgent"
 
     def __init__(self):
-        self.db_path = "backend/database/xp_db.json"
+        self.file_path = Path("database/xp_db.json")
 
-    async def run(self, user_input: str):
-        data = {"xp": "increased"}
+    def _load(self):
+        with open(self.file_path, "r") as f:
+            return json.load(f)
 
-        if self.db_path:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-            with open(self.db_path, "w") as f:
-                json.dump(data, f)
+    def _save(self, data):
+        with open(self.file_path, "w") as f:
+            json.dump(data, f, indent=2)
+
+    def _calculate_level(self, xp):
+        if xp < 50:
+            return 1
+        if xp < 150:
+            return 2
+        if xp < 300:
+            return 3
+        return 4
+
+    async def reward(self):
+        data = self._load()
+        data["xp"] += 10
+        data["level"] = self._calculate_level(data["xp"])
+        self._save(data)
 
         return {
             "agent": self.name,
             "status": "success",
-            "message": "XP increased",
+            "message": f"XP +10 (Level {data['level']})",
             "data": data
         }
+
 
 
 

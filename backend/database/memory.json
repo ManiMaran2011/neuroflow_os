@@ -1,0 +1,1779 @@
+{
+  "users": {
+    "default_user": {
+      "preferences": {},
+      "executions": [
+        {
+          "timestamp": "2025-12-21T08:02:41.705879",
+          "user_input": "What is Quantum Computing",
+          "execution_plan": {
+            "plan_id": "74bfe69c-c2ad-41ae-87bf-2e59b76d75df",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:03:04.788080",
+          "user_input": "Remind me to gym at 8pm",
+          "execution_plan": {
+            "plan_id": "d60a1f38-8788-41e9-8e00-a497b57921d5",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:03:11.450692",
+          "user_input": "Remind me to gym at 8pm",
+          "execution_plan": {
+            "plan_id": "285a2aa0-4477-4bd6-81d3-6eb88172ef5c",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:08:52.705202",
+          "user_input": "Add task to buy groceries today at 6pm",
+          "execution_plan": {
+            "plan_id": "fb6fde70-96e6-43ad-9101-083009c8d5a7",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:09:33.405136",
+          "user_input": "Do the same for day after tommorrow",
+          "execution_plan": {
+            "plan_id": "6ad5415e-a041-499f-81dd-52444940589b",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:09:38.052471",
+          "user_input": "Do the same for day after tommorrow",
+          "execution_plan": {
+            "plan_id": "cbeb463e-fb4a-43e1-b4b5-d4e04b3413ba",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:09:43.244405",
+          "user_input": "Do the same for day after tommorrow",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:10:10.948029",
+          "user_input": "add task like last time",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:10:16.743017",
+          "user_input": "add task like last time",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:10:24.374235",
+          "user_input": "add task like last time",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:10:32.024033",
+          "user_input": "add task like last time",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:10:51.899996",
+          "user_input": "add task and remind me like last time",
+          "execution_plan": {
+            "plan_id": "41be4eab-038e-4856-9ec5-02c609e48e04",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:11:19.921089",
+          "user_input": "Add task to buy groceries and remind me at 6pm today",
+          "execution_plan": {
+            "plan_id": "faf786e4-1fde-482a-8cd6-a68d7d5e497a",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:11:26.435466",
+          "user_input": "Add task to buy groceries and remind me at 6pm today",
+          "execution_plan": {
+            "plan_id": "f520dc38-acd1-45b2-a53a-2342ce1d657d",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:11:31.717311",
+          "user_input": "Add task to buy groceries and remind me at 6pm today",
+          "execution_plan": {
+            "plan_id": "baad17aa-bf78-4de7-aced-861f388877e0",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:12:11.265636",
+          "user_input": "Do the same for tommorrow",
+          "execution_plan": {
+            "plan_id": "4867eec0-c683-4438-9b7f-4409e65bc9d0",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:12:16.430072",
+          "user_input": "Do the same for tommorrow",
+          "execution_plan": {
+            "plan_id": "482783c2-51b2-4788-be71-30016d486a95",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:12:20.431715",
+          "user_input": "Do the same for tommorrow",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:13:14.022175",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:14:04.141442",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:14:08.193123",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:14:13.436712",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:14:18.346244",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:14:20.685112",
+          "user_input": "remind me like last time",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:16:59.960141",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:17:03.319112",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:17:08.465527",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": "4c9270f9-1898-4be4-9aff-cbf28a6d5303",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:17:23.074709",
+          "user_input": "Remind me to buy groceries at 6pm\n",
+          "execution_plan": {
+            "plan_id": "d7c3228c-defc-4dbe-9f0b-2229b84e4f59",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:17:30.065029",
+          "user_input": "Remind me to buy groceries at 6pm\n",
+          "execution_plan": {
+            "plan_id": "a2cfe376-e936-4582-bc4b-26e7c1ead38e",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:17:33.739575",
+          "user_input": "Remind me to buy groceries at 6pm\n",
+          "execution_plan": {
+            "plan_id": "eb6eaef4-a1ad-49d7-8910-6ccdd7358ab2",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:18:45.160084",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": "eb6eaef4-a1ad-49d7-8910-6ccdd7358ab2",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:28:08.252162",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": "eb6eaef4-a1ad-49d7-8910-6ccdd7358ab2",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:28:48.704857",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:29:10.444804",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:29:14.151425",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:29:20.851719",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:29:23.098639",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:30:24.477501",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:33:18.818405",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:33:30.101986",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:33:34.152601",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:34:21.164538",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:34:27.874545",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:34:31.998951",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "b6f0a1cc-4bb4-47c0-8a97-75ac4fca68bb",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:38:11.081968",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:38:47.619510",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T08:43:58.247479",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:02:05.975962",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:07:27.339370",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:15:45.398819",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:16:14.954923",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "c19032d3-7a84-4a1c-a2d9-393b5d0f8db6",
+            "intent": "unknown",
+            "agents": [
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:17:46.269173",
+          "user_input": "Explain Quantum Computing",
+          "execution_plan": {
+            "plan_id": "f64522b3-0858-4e9f-b28b-e30fd7e4e2b1",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:19:46.454955",
+          "user_input": "Add task to buy groceries and remind me today at 6pm",
+          "execution_plan": {
+            "plan_id": "89ac2229-b4e0-4551-9f13-5100748f838a",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:19:59.011529",
+          "user_input": "Add task to buy groceries and remind me ",
+          "execution_plan": {
+            "plan_id": "4f73c3ec-4d92-4dda-a731-e01f754ce00e",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:20:22.102383",
+          "user_input": "Add task to buy groceries and remind me ",
+          "execution_plan": {
+            "plan_id": "4f73c3ec-4d92-4dda-a731-e01f754ce00e",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:20:24.644317",
+          "user_input": "Add task to buy groceries and remind me ",
+          "execution_plan": {
+            "plan_id": "4f73c3ec-4d92-4dda-a731-e01f754ce00e",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:20:27.881495",
+          "user_input": "Add task to buy groceries and remind me ",
+          "execution_plan": {
+            "plan_id": "4f73c3ec-4d92-4dda-a731-e01f754ce00e",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:30:23.526672",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:30:43.874524",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:30:46.762000",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:30:48.535269",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:42:52.075353",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:42:55.096942",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:42:57.875074",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": "46da2ae2-2e5c-427b-81f3-3e56217aa603",
+            "intent": "unknown",
+            "agents": [
+              "ResearchAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved",
+            "ResearchAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:46:08.988174",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:46:15.678143",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:51:11.837107",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Execution plan created",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T09:54:53.455558",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T10:13:38.817626",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T10:58:35.500565",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T10:59:46.191058",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:01:13.530019",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:02:40.977318",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:06:39.819309",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:07:08.710011",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:08:19.642978",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:10:35.549018",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:17:11.888706",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "unknown",
+            "agents": [],
+            "priority": "low",
+            "confidence": 0.3,
+            "reasoning": "Could not clearly determine intent",
+            "requires_approval": false
+          },
+          "timeline": [
+            "Intent analyzed",
+            "Previous execution recalled from memory",
+            "Execution approved"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:20:49.790031",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:24:54.233413",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:25:13.503060",
+          "user_input": "do it again",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:30:57.027190",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:47:59.023154",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:52:08.090883",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:55:58.950355",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T11:56:19.019958",
+          "user_input": "Do it again",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T12:34:56.665625",
+          "user_input": "Add task to buy groceries and remind me",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T12:47:28.180362",
+          "user_input": "Add task to buy groceries and remind me\n",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        },
+        {
+          "timestamp": "2025-12-21T12:48:45.479457",
+          "user_input": "Add task to buy groceries and remind me\n",
+          "execution_plan": {
+            "plan_id": null,
+            "intent": "task_with_reminder",
+            "agents": [
+              "TaskAgent",
+              "NotificationAgent"
+            ],
+            "priority": "low",
+            "confidence": 0.5,
+            "reasoning": "",
+            "requires_approval": true
+          },
+          "timeline": [
+            "Execution plan reused after approval",
+            "Execution approved",
+            "TaskAgent executed",
+            "NotificationAgent executed"
+          ]
+        }
+      ]
+    }
+  }
+}
