@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import time
 
-BACKEND_URL = "http://127.0.0.1:8000/ask"
+BACKEND_URL = "https://neuroflow-os.onrender.com/ask"
 
 ALL_AGENTS = [
     "TaskAgent",
