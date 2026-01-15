@@ -11,7 +11,7 @@ from backend.auth.auth_routes import router as auth_router
 from backend.ask_routes import router as ask_router
 from backend.execution.execution_routes import router as execution_router
 from backend.voice.voice_routes import router as voice_router
-
+from backend.auth.google_auth import router as google_auth_router 
 
 # -------------------------
 # CREATE APP
@@ -44,6 +44,7 @@ app.include_router(auth_router)
 app.include_router(ask_router)
 app.include_router(execution_router)
 app.include_router(voice_router)
+app.include_router(google_auth_router)
 
 
 
