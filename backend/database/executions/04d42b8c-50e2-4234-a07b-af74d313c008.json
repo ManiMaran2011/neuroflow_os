@@ -1,0 +1,10 @@
+{
+  "execution_id": "04d42b8c-50e2-4234-a07b-af74d313c008",
+  "user_id": "nm@gmail.com",
+  "created_at": "2026-01-11T07:03:10.090886",
+  "status": "initialized",
+  "timeline": [
+    "Execution created for user nm@gmail.com"
+  ],
+  "agents": {}
+}

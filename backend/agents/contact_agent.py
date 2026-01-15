@@ -1,27 +1,16 @@
-from base_agent import BaseAgent
-import json
-import os
+from backend.agents.base_agent import BaseAgent
+
 
 class ContactAgent(BaseAgent):
-    name = "ContactAgent"
-
     def __init__(self):
-        self.db_path = "backend/database/contacts_db.json"
+        super().__init__("ContactAgent")
 
-    async def run(self, user_input: str):
-        data = {
-            "contact": user_input
-        }
-
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        with open(self.db_path, "w") as f:
-            json.dump(data, f)
-
+    async def run(self, user_input: str, params: dict) -> dict:
         return {
             "agent": self.name,
-            "status": "success",
-            "message": "Contact saved",
-            "data": data
+            "action": "manage_contact",
+            "contact": params
         }
+
 
 

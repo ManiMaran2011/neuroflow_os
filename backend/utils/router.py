@@ -1,57 +1,30 @@
-async def classify_intent(user_input: str):
+# backend/utils/router.py
+
+async def classify_intent(user_input: str) -> dict:
+    """
+    Lightweight intent classifier (MVP).
+    """
+
     text = user_input.lower()
 
-    action_keywords = [
-        "add",
-        "create",
-        "remind",
-        "schedule",
-        "set",
-        "notify",
-        "book",
-        "do it again"
-    ]
-
-    think_keywords = [
-        "what is",
-        "explain",
-        "define",
-        "how does",
-        "tell me about"
-    ]
-
-    if any(k in text for k in action_keywords):
-        agents = []
-
-        if "task" in text or "add" in text:
-            agents.append("TaskAgent")
-
-        if "remind" in text or "notify" in text:
-            agents.append("NotificationAgent")
-
-        if not agents:
-            agents.append("TaskAgent")
-
+    # ---- Scheduling intent ----
+    if "schedule" in text or "meeting" in text or "calendar" in text:
         return {
             "mode": "ACT",
-            "intent": "task_with_reminder",
-            "agents": agents,
-            "priority": "high",
-            "confidence": 0.9
+            "intent": "schedule_meeting",
+            "params": {},
+            "confidence": 0.9,
+            "priority": "medium",
+            "reasoning": "User wants to schedule a meeting"
         }
 
-    if any(k in text for k in think_keywords):
-        return {
-            "mode": "THINK",
-            "intent": "informational",
-            "agents": ["ResearchAgent"],
-            "confidence": 0.9
-        }
-
+    # ---- Default THINK mode ----
     return {
         "mode": "THINK",
-        "intent": "unknown",
-        "agents": ["ResearchAgent"],
-        "confidence": 0.5
+        "intent": "general_query",
+        "params": {},
+        "confidence": 0.3,
+        "priority": "low",
+        "reasoning": "No actionable intent detected"
     }
 

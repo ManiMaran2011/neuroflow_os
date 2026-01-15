@@ -1,49 +1,68 @@
-from agents.task_agent import TaskAgent
-from agents.calendar_agent import CalendarAgent
-from agents.research_agent import ResearchAgent
-from agents.browser_agent import BrowserAgent
-from agents.notification_agent import NotificationAgent
-from agents.report_agent import ReportAgent
-from agents.contact_agent import ContactAgent
-from agents.energy_agent import EnergyAgent
-from agents.xp_agent import XPAgent
+from backend.agent_registry import get_agent_instances
+from backend.db.models import ExecutionTimeline
+import traceback
+
 
 class ParentAgent:
-    def __init__(self):
-        self.action_agents = [
-            TaskAgent(),
-            CalendarAgent(),
-            NotificationAgent(),
-            BrowserAgent(),
-            ReportAgent(),
-            ContactAgent(),
-            EnergyAgent()
-        ]
-        self.research_agent = ResearchAgent()
-        self.xp_agent = XPAgent()
+    async def handle(self, db, execution, execution_plan, user_input):
+        db.add(ExecutionTimeline(
+            execution_id=execution.id,
+            message="ParentAgent started execution"
+        ))
+        db.commit()
 
-    async def handle(self, user_input: str, execution_plan: dict | None = None):
+        agents = get_agent_instances(execution_plan.get("agents", []))
         results = {}
 
-        if execution_plan is None:
-            research = await self.research_agent.run(user_input)
-            return {
-                "mode": "THINK",
-                "results": {"ResearchAgent": research}
-            }
+        for agent in agents:
+            agent_name = agent.__class__.__name__
 
-        for agent in self.action_agents:
-            if agent.name in execution_plan["agents"]:
-                result = await agent.run(user_input)
-                results[agent.name] = result
+            db.add(ExecutionTimeline(
+                execution_id=execution.id,
+                message=f"{agent_name} execution started"
+            ))
+            db.commit()
 
-        xp_result = await self.xp_agent.reward()
-        results["XPAgent"] = xp_result
+            try:
+                result = await agent.run(
+                    user_input=user_input,
+                    params=execution_plan.get("params", {})
+                )
+            except Exception as e:
+                result = {
+                    "status": "error",
+                    "error": str(e),
+                    "traceback": traceback.format_exc()
+                }
+
+            results[agent_name] = result
+
+            db.add(ExecutionTimeline(
+                execution_id=execution.id,
+                message=f"{agent_name} execution completed"
+            ))
+            db.commit()
+
+        execution.status = "executed"
+        db.commit()
 
         return {
-            "mode": "ACT",
+            "status": "executed",
             "results": results
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

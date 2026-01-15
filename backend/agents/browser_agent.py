@@ -1,19 +1,16 @@
-from base_agent import BaseAgent
+from backend.agents.base_agent import BaseAgent
+
 
 class BrowserAgent(BaseAgent):
-    name = "BrowserAgent"
-
     def __init__(self):
-        self.db_path = None
+        super().__init__("BrowserAgent")
 
-    async def run(self, user_input: str):
+    async def run(self, user_input: str, params: dict) -> dict:
         return {
             "agent": self.name,
-            "status": "success",
-            "message": "Browser lookup simulated",
-            "data": {
-                "query": user_input
-            }
+            "action": "browse",
+            "result": f"Simulated browsing for: {user_input}"
         }
+
 
 

@@ -1,21 +1,17 @@
-from base_agent import BaseAgent
+from backend.agents.base_agent import BaseAgent
+
 
 class ResearchAgent(BaseAgent):
-    name = "ResearchAgent"
-
     def __init__(self):
-        self.db_path = None
+        super().__init__("ResearchAgent")
 
-    async def run(self, user_input: str):
+    async def run(self, user_input: str, params: dict) -> dict:
         return {
             "agent": self.name,
-            "status": "success",
-            "message": "Research completed",
-            "data": {
-                "query": user_input,
-                "result": "This is a placeholder research response"
-            }
+            "action": "research",
+            "summary": f"Research summary for: {user_input}"
         }
+
 
 
 

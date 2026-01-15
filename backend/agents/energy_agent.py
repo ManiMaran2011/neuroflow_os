@@ -1,26 +1,15 @@
-import json
-import os
+from backend.agents.base_agent import BaseAgent
 
-class EnergyAgent:
-    name = "EnergyAgent"
 
+class EnergyAgent(BaseAgent):
     def __init__(self):
-        self.db_path = "backend/database/energy_db.json"
+        super().__init__("EnergyAgent")
 
-    async def run(self, user_input: str):
-        data = {
-            "energy_preference": user_input
-        }
-
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        with open(self.db_path, "w") as f:
-            json.dump(data, f)
-
+    async def run(self, user_input: str, params: dict) -> dict:
         return {
             "agent": self.name,
-            "status": "success",
-            "message": "Energy preference updated",
-            "data": data
+            "action": "analyze_energy",
+            "status": "Energy usage analyzed (mock)"
         }
 
 

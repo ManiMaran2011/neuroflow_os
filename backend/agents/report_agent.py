@@ -1,28 +1,14 @@
-from base_agent import BaseAgent
-import json
-import os
+from backend.agents.base_agent import BaseAgent
 
 class ReportAgent(BaseAgent):
     name = "ReportAgent"
 
-    def __init__(self):
-        self.db_path = "backend/database/report_db.json"
-
-    async def run(self, user_input: str):
-        data = {
-            "report": "Weekly report generated"
-        }
-
-        if self.db_path:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-            with open(self.db_path, "w") as f:
-                json.dump(data, f)
-
+    async def run(self, user_input=None, params=None):
         return {
-            "agent": self.name,
-            "status": "success",
-            "message": "Weekly report generated",
-            "data": data
+            "status": "simulated",
+            "message": "Execution report generated"
         }
+
+
 
 
