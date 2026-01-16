@@ -1,50 +1,47 @@
-from datetime import datetime
-import os.path
+import json
+import os
+from datetime import datetime, timedelta
+
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
 from backend.agents.base_agent import BaseAgent
 
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-
-SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
-
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 class CalendarAgent(BaseAgent):
     name = "CalendarAgent"
 
     async def run(self, user_input=None, params=None) -> dict:
-        creds = None
+        service_account_info = json.loads(
+            os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+        )
 
-        base_dir = os.path.dirname(__file__)
-        token_path = os.path.join(base_dir, "token.json")
-        creds_path = os.path.join(base_dir, "credentials.json")
+        credentials = service_account.Credentials.from_service_account_info(
+            service_account_info,
+            scopes=SCOPES,
+        )
 
-        # Load existing token
-        if os.path.exists(token_path):
-            creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+        service = build("calendar", "v3", credentials=credentials)
 
-        # If no valid creds, run OAuth flow
-        if not creds or not creds.valid:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                creds_path, SCOPES
-            )
-            creds = flow.run_local_server(port=0)
+        start = params.get("start")
+        end = params.get("end")
 
-            # Save token
-            with open(token_path, "w") as token:
-                token.write(creds.to_json())
-
-        service = build("calendar", "v3", credentials=creds)
+        # fallback (demo-safe)
+        if not start:
+            start_dt = datetime.utcnow() + timedelta(minutes=5)
+            end_dt = start_dt + timedelta(hours=1)
+            start = start_dt.isoformat() + "Z"
+            end = end_dt.isoformat() + "Z"
 
         event = {
-            "summary": params.get("title", "NeuroFlow Event"),
+            "summary": params.get("title", "NeuroFlow Task"),
             "start": {
-                "dateTime": params["start"],
+                "dateTime": start,
                 "timeZone": "UTC",
             },
             "end": {
-                "dateTime": params["end"],
+                "dateTime": end,
                 "timeZone": "UTC",
             },
         }
@@ -56,15 +53,11 @@ class CalendarAgent(BaseAgent):
 
         return {
             "agent": self.name,
-            "action": "create_calendar_event",
-            "event": {
-                "id": created_event.get("id"),
-                "title": created_event.get("summary"),
-                "start": created_event["start"]["dateTime"],
-                "end": created_event["end"]["dateTime"],
-                "link": created_event.get("htmlLink"),
-            }
+            "action": "calendar_event_created",
+            "event_id": created_event["id"],
+            "htmlLink": created_event["htmlLink"],
         }
+
 
 
 
