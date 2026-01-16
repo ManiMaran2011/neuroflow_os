@@ -47,7 +47,7 @@ class CalendarAgent(BaseAgent):
         }
 
         created_event = service.events().insert(
-            calendarId="primary",
+            calendarId=os.environ["GOOGLE_CALENDAR_ID"],
             body=event
         ).execute()
 
