@@ -14,3 +14,9 @@ async def create_plan(plan: dict):
         "plan_id": "plan_123",
         "status": "stored"
     }
+@router.get("/monitor")
+async def get_plans_for_monitoring():
+    """
+    Return active plans for passive monitoring.
+    """
+    return []
