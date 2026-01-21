@@ -131,6 +131,8 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
     db.add(timeline)
     db.commit()
 
+    print(f"🔥 XP AWARDED: {xp_gained} for action {action}")
+
     return {
         "status": "logged",
         "execution_id": execution.id,
