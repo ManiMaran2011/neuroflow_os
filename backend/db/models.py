@@ -55,6 +55,15 @@ class ExecutionTimeline(Base):
     message = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+# ------------------------
+# USER STREAK MODEL
+# ------------------------
+class UserStreak(Base):
+    __tablename__ = "user_streaks"
+
+    user_email = Column(String, primary_key=True, index=True)
+    current_streak = Column(Integer, default=0)
+    last_active_date = Column(DateTime, nullable=True)
 
 
 
