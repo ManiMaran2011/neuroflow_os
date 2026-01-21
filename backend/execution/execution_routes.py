@@ -98,26 +98,26 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
     No user auth — system-level logging.
     """
 
-action = payload.get("action_taken")
+    action = payload.get("action_taken")
 
-# Simple XP rules (v1)
-XP_RULES = {
-    "telegram_nudge_sent": 10
-}
+    # Simple XP rules (v1)
+    XP_RULES = {
+        "telegram_nudge_sent": 10
+    }
 
-xp_gained = XP_RULES.get(action, 0)
+    xp_gained = XP_RULES.get(action, 0)
 
-execution = Execution(
-    user_email=payload.get("user_email", "system"),
-    intent=payload.get("decision_source", "passive_monitoring"),
-    actions=action,
-    agents=payload.get("channel"),
-    params=payload,
-    status="completed",
-    estimated_tokens=payload.get("estimated_tokens"),
-    estimated_cost=payload.get("estimated_cost"),
-    xp_gained=xp_gained
-)
+    execution = Execution(
+        user_email=payload.get("user_email", "system"),
+        intent=payload.get("decision_source", "passive_monitoring"),
+        actions=action,
+        agents=payload.get("channel"),
+        params=payload,
+        status="completed",
+        estimated_tokens=payload.get("estimated_tokens"),
+        estimated_cost=payload.get("estimated_cost"),
+        xp_gained=xp_gained
+    )
 
     db.add(execution)
     db.commit()
@@ -133,8 +133,10 @@ execution = Execution(
 
     return {
         "status": "logged",
-        "execution_id": execution.id
+        "execution_id": execution.id,
+        "xp_gained": xp_gained
     }
+
 
 
 
