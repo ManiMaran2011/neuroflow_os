@@ -14,6 +14,8 @@ from backend.voice.voice_routes import router as voice_router
 from backend.auth.google_auth import router as google_auth_router 
 from backend.plans.plans_routes import router as plans_router
 from backend.users.user_routes import router as user_router
+from backend.auth.google_oauth_routes import router as google_oauth_router
+
 
 
 
@@ -51,6 +53,7 @@ app.include_router(voice_router)
 app.include_router(google_auth_router)
 app.include_router(plans_router)
 app.include_router(user_router)
+app.include_router(google_oauth_router)
 
 
 
