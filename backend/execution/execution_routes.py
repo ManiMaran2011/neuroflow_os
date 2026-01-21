@@ -176,12 +176,6 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
 
     db.commit()
 
-    # --------------------
-    # DEBUG LOGS (TEMP)
-    # --------------------
-    print(f"🔥 XP AWARDED: {xp_gained} for action {action}")
-    print(f"🔥 STREAK: {streak.current_streak} days for {user_email}")
-
     return {
         "status": "logged",
         "execution_id": execution.id,
