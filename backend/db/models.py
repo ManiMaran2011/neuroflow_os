@@ -15,6 +15,20 @@ class User(Base):
     email = Column(String, primary_key=True, index=True)
     xp = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
+# ------------------------
+# GOOGLE OAUTH TOKEN MODEL
+# ------------------------
+class GoogleOAuthToken(Base):
+    __tablename__ = "google_oauth_tokens"
+
+    user_email = Column(String, primary_key=True, index=True)
+
+    access_token = Column(String)
+    refresh_token = Column(String)
+    expires_at = Column(DateTime)
+
+    scope = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 # ------------------------
