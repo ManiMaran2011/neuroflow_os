@@ -2,7 +2,7 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -18,10 +18,9 @@ router = APIRouter(prefix="/oauth", tags=["google-oauth"])
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
-
 FRONTEND_REDIRECT_URI = os.getenv(
     "FRONTEND_REDIRECT_URI",
-    "http://localhost:3000"
+    "https://neuroflow-ui.vercel.app"
 )
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -36,17 +35,12 @@ SCOPES = [
 # ----------------------------------------
 @router.get("/google/connect")
 def connect_google_calendar(
-    request: Request,
-    db: Session = Depends(get_db)
+    token: str = Query(...),
 ):
     if not GOOGLE_CLIENT_ID or not GOOGLE_REDIRECT_URI:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
 
-    # 🔐 Read JWT from query param (browser redirect safe)
-    token = request.query_params.get("token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Missing token")
-
+    # 🔐 MANUALLY VERIFY JWT
     payload = verify_token(token)
     user_email = payload.get("sub")
 
@@ -60,7 +54,7 @@ def connect_google_calendar(
         "scope": " ".join(SCOPES),
         "access_type": "offline",
         "prompt": "consent",
-        "state": user_email,  # 👈 tie OAuth to user
+        "state": user_email,
     }
 
     auth_url = requests.Request(
@@ -69,9 +63,7 @@ def connect_google_calendar(
         params=params
     ).prepare().url
 
-    return {
-        "auth_url": auth_url
-    }
+    return RedirectResponse(auth_url)
 
 
 # ----------------------------------------
@@ -97,10 +89,7 @@ def google_oauth_callback(
     token_response = requests.post(GOOGLE_TOKEN_URL, data=token_data)
 
     if token_response.status_code != 200:
-        raise HTTPException(
-            status_code=400,
-            detail="Failed to fetch Google token"
-        )
+        raise HTTPException(status_code=400, detail="Failed to fetch Google token")
 
     token_json = token_response.json()
 
@@ -132,9 +121,10 @@ def google_oauth_callback(
 
     db.commit()
 
-    # ✅ Redirect back to frontend after success
+    # ✅ Redirect back to frontend
     return RedirectResponse(
         url=f"{FRONTEND_REDIRECT_URI}?calendar=connected"
     )
+
 
 
