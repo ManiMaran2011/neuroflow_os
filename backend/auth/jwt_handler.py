@@ -52,8 +52,13 @@ def verify_token(token: str):
 # =========================
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    request: Request,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
+    # 🔥 Allow CORS preflight
+    if request.method == "OPTIONS":
+        return None
+
     token = credentials.credentials
     payload = verify_token(token)
 
@@ -62,7 +67,6 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid token payload")
 
     return user_email
-
 
 
 
