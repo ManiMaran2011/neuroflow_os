@@ -69,7 +69,9 @@ def connect_google_calendar(
         params=params
     ).prepare().url
 
-    return RedirectResponse(auth_url)
+    return {
+        "auth_url": auth_url
+    }
 
 
 # ----------------------------------------
