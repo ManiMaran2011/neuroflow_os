@@ -1,9 +1,10 @@
+import os
+import requests
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-import requests
-import os
-from datetime import datetime, timedelta
 
 from backend.db.database import get_db
 from backend.db.models import GoogleOAuthToken
@@ -17,6 +18,10 @@ router = APIRouter(prefix="/oauth", tags=["google-oauth"])
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+FRONTEND_REDIRECT_URI = os.getenv(
+    "FRONTEND_REDIRECT_URI",
+    "http://localhost:3000"
+)
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -24,7 +29,6 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 SCOPES = [
     "https://www.googleapis.com/auth/calendar.events"
 ]
-
 
 # ----------------------------------------
 # CONNECT GOOGLE CALENDAR
@@ -43,7 +47,7 @@ def connect_google_calendar(
         "scope": " ".join(SCOPES),
         "access_type": "offline",
         "prompt": "consent",
-        "state": user_email
+        "state": user_email,  # 👈 ties OAuth to user
     }
 
     auth_url = requests.Request(
@@ -61,7 +65,7 @@ def connect_google_calendar(
 @router.get("/callback")
 def google_oauth_callback(
     code: str,
-    state: str,
+    state: str,  # user_email
     db: Session = Depends(get_db)
 ):
     if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
@@ -72,16 +76,13 @@ def google_oauth_callback(
         "client_secret": GOOGLE_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": GOOGLE_REDIRECT_URI
+        "redirect_uri": GOOGLE_REDIRECT_URI,
     }
 
     token_response = requests.post(GOOGLE_TOKEN_URL, data=token_data)
 
     if token_response.status_code != 200:
-        raise HTTPException(
-            status_code=400,
-            detail="Failed to fetch Google token"
-        )
+        raise HTTPException(status_code=400, detail="Failed to fetch Google token")
 
     token_json = token_response.json()
 
@@ -113,8 +114,8 @@ def google_oauth_callback(
 
     db.commit()
 
-    return {
-        "status": "connected",
-        "message": "Google Calendar connected successfully"
-    }
+    # ✅ Redirect back to frontend after success
+    return RedirectResponse(
+        url=f"{FRONTEND_REDIRECT_URI}?calendar=connected"
+    )
 
