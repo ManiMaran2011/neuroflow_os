@@ -6,8 +6,6 @@ from backend.db.database import get_db
 from backend.db.models import Execution, ExecutionTimeline, UserStreak
 from backend.auth.jwt_handler import get_current_user
 from backend.execution.execution_service import approve_execution
-
-# 🔔 NEW AGENT
 from backend.execution.agentss.notify_agent import NotifyAgent
 
 router = APIRouter(
