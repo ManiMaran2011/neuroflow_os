@@ -7,9 +7,8 @@ from backend.db.models import Execution, ExecutionTimeline, UserStreak
 from backend.auth.jwt_handler import get_current_user
 from backend.execution.execution_service import approve_execution
 
-# 🔥 NEW AGENTS
-from backend.execution.agentss.monitor_agent import MonitorAgent
-from backend.execution.agentss.evaluate_progress_agent import EvaluateProgressAgent
+# 🔔 NEW AGENT
+from backend.execution.agentss.notify_agent import NotifyAgent
 
 router = APIRouter(
     prefix="/executions",
@@ -91,94 +90,68 @@ async def approve_execution_api(
 
 
 # ----------------------------------------
-# 🔥 EVALUATE PROGRESS (MONITOR + LLM)
+# EVALUATE PROGRESS (MONITOR → NOTIFY)
 # ----------------------------------------
 @router.post("/evaluate-progress")
 async def evaluate_progress(
     payload: dict,
-    user_email: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    user_email: str = Depends(get_current_user)
 ):
     """
-    Evaluates user progress on a plan and decides
-    whether the system should act (no execution yet).
+    Evaluates user progress for long-running plans
+    (habits, fitness, learning, etc.)
     """
 
     plan = payload.get("plan")
-    execution_history = payload.get("execution_history", [])
+    history = payload.get("execution_history", [])
 
     if not plan:
-        raise HTTPException(status_code=400, detail="Missing plan")
-
-    monitor = MonitorAgent()
-    evaluator = EvaluateProgressAgent()
+        raise HTTPException(status_code=400, detail="Plan missing")
 
     # --------------------
-    # STEP 1: MONITOR
+    # RULE-BASED EVALUATION
     # --------------------
-    monitor_result = await monitor.run(
-        plan=plan,
-        execution_history=execution_history,
-        now=datetime.utcnow(),
+    missed_days = [
+        h for h in history if h.get("status") == "missed"
+    ]
+
+    consecutive_misses = len(missed_days)
+
+    action_taken = "progress_ok"
+    message = "User is on track"
+    xp_gained = 5
+
+    if consecutive_misses >= 2:
+        action_taken = "monitor_nudge"
+        message = "You’ve missed a few days. Want help getting back on track?"
+        xp_gained = -5
+
+    # --------------------
+    # 🔔 NOTIFY AGENT
+    # --------------------
+    notifier = NotifyAgent()
+    notification_result = await notifier.run(
+        user_email=user_email,
+        message=message,
+        reason="progress_evaluation"
     )
-
-    if not monitor_result.get("action_needed"):
-        return {
-            "status": "no_action",
-            "agent": "MonitorAgent",
-            "reason": monitor_result.get("reason"),
-        }
-
-    # --------------------
-    # STEP 2: EVALUATE (LLM)
-    # --------------------
-    evaluation = await evaluator.run(
-        plan=plan,
-        execution_history=execution_history,
-    )
-
-    return {
-        "status": "evaluation_complete",
-        "user": user_email,
-        "monitor": monitor_result,
-        "evaluation": evaluation,
-        "timestamp": datetime.utcnow().isoformat(),
-    }
-
-
-# ----------------------------------------
-# LOG EXECUTION (AGENT / SYSTEM)
-# ----------------------------------------
-@router.post("/log")
-async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db)):
-    """
-    Receives execution logs from agentic systems.
-    System-level logging (no user auth).
-    """
-
-    # --------------------
-    # XP CALCULATION
-    # --------------------
-    action = payload.get("action_taken")
-
-    XP_RULES = {
-        "telegram_nudge_sent": 10,
-        "calendar_event_created": 15,
-    }
-
-    xp_gained = XP_RULES.get(action, 0)
 
     # --------------------
     # CREATE EXECUTION
     # --------------------
     execution = Execution(
-        user_email=payload.get("user_email", "system"),
-        intent=payload.get("decision_source", "passive_monitoring"),
-        actions=action,
-        agents=payload.get("channel"),
-        params=payload,
+        user_email=user_email,
+        intent=plan.get("intent", "progress_monitoring"),
+        actions=action_taken,
+        agents=["MonitorAgent", "NotifyAgent"],
+        params={
+            "plan": plan,
+            "history": history,
+            "notification": notification_result
+        },
         status="completed",
-        estimated_tokens=payload.get("estimated_tokens"),
-        estimated_cost=payload.get("estimated_cost"),
+        requires_approval=False,
         xp_gained=xp_gained
     )
 
@@ -187,22 +160,20 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
     db.refresh(execution)
 
     # --------------------
-    # EXECUTION TIMELINE
+    # TIMELINE ENTRY
     # --------------------
     timeline = ExecutionTimeline(
         execution_id=execution.id,
-        message="Execution logged from agent"
+        message=f"NotifyAgent executed: {message}"
     )
 
     db.add(timeline)
-    db.commit()
 
     # --------------------
-    # STREAK TRACKING
+    # STREAK MANAGEMENT
     # --------------------
     now = datetime.utcnow()
     today = now.date()
-    user_email = payload.get("user_email", "system")
 
     streak = db.query(UserStreak).filter(
         UserStreak.user_email == user_email
@@ -215,21 +186,17 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
             last_active_date=now
         )
         db.add(streak)
-
     else:
         last_date = (
             streak.last_active_date.date()
-            if streak.last_active_date
-            else None
+            if streak.last_active_date else None
         )
 
         if last_date == today:
             pass
-
         elif last_date == today - timedelta(days=1):
             streak.current_streak += 1
             streak.last_active_date = now
-
         else:
             streak.current_streak = 1
             streak.last_active_date = now
@@ -237,11 +204,15 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
     db.commit()
 
     return {
-        "status": "logged",
+        "status": "evaluated",
         "execution_id": execution.id,
+        "action_taken": action_taken,
         "xp_gained": xp_gained,
-        "current_streak": streak.current_streak
+        "current_streak": streak.current_streak,
+        "notification": notification_result
     }
+
+
 
 
 

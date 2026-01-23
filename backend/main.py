@@ -17,15 +17,16 @@ from backend.users.user_routes import router as user_router
 from backend.auth.google_oauth_routes import router as google_oauth_router
 from backend.calendar.calendar_routes import router as calendar_router
 from backend.execution.execution_router import router as execution_router
-
-
-
-
+from backend.monitor.monitor_scheduler import start_monitor_scheduler
+from backend.monitor.monitor_routes import router as monitor_router
 
 # -------------------------
 # CREATE APP
 # -------------------------
 app = FastAPI()
+@app.on_event("startup")
+def startup_event():
+    start_monitor_scheduler()
 
 
 # -------------------------
@@ -62,6 +63,7 @@ app.include_router(user_router)
 app.include_router(google_oauth_router)
 app.include_router(calendar_router)
 app.include_router(execution_router)
+app.include_router(monitor_router)
 
 
 
