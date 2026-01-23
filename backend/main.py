@@ -38,8 +38,9 @@ Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://neuroflow-os.vercel.app",
         "http://localhost:3000",
-        "https://neuroflow-os.vercel.app/"],
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
