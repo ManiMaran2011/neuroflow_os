@@ -7,6 +7,10 @@ from backend.db.models import Execution, ExecutionTimeline, UserStreak
 from backend.auth.jwt_handler import get_current_user
 from backend.execution.execution_service import approve_execution
 
+# 🔥 NEW AGENTS
+from backend.execution.agentss.monitor_agent import MonitorAgent
+from backend.execution.agentss.evaluate_progress_agent import EvaluateProgressAgent
+
 router = APIRouter(
     prefix="/executions",
     tags=["executions"]
@@ -87,13 +91,68 @@ async def approve_execution_api(
 
 
 # ----------------------------------------
+# 🔥 EVALUATE PROGRESS (MONITOR + LLM)
+# ----------------------------------------
+@router.post("/evaluate-progress")
+async def evaluate_progress(
+    payload: dict,
+    user_email: str = Depends(get_current_user),
+):
+    """
+    Evaluates user progress on a plan and decides
+    whether the system should act (no execution yet).
+    """
+
+    plan = payload.get("plan")
+    execution_history = payload.get("execution_history", [])
+
+    if not plan:
+        raise HTTPException(status_code=400, detail="Missing plan")
+
+    monitor = MonitorAgent()
+    evaluator = EvaluateProgressAgent()
+
+    # --------------------
+    # STEP 1: MONITOR
+    # --------------------
+    monitor_result = await monitor.run(
+        plan=plan,
+        execution_history=execution_history,
+        now=datetime.utcnow(),
+    )
+
+    if not monitor_result.get("action_needed"):
+        return {
+            "status": "no_action",
+            "agent": "MonitorAgent",
+            "reason": monitor_result.get("reason"),
+        }
+
+    # --------------------
+    # STEP 2: EVALUATE (LLM)
+    # --------------------
+    evaluation = await evaluator.run(
+        plan=plan,
+        execution_history=execution_history,
+    )
+
+    return {
+        "status": "evaluation_complete",
+        "user": user_email,
+        "monitor": monitor_result,
+        "evaluation": evaluation,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+
+# ----------------------------------------
 # LOG EXECUTION (AGENT / SYSTEM)
 # ----------------------------------------
 @router.post("/log")
 async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db)):
     """
-    Receives execution logs from agentic systems (Dify).
-    No user auth — system-level logging.
+    Receives execution logs from agentic systems.
+    System-level logging (no user auth).
     """
 
     # --------------------
@@ -102,7 +161,8 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
     action = payload.get("action_taken")
 
     XP_RULES = {
-        "telegram_nudge_sent": 10
+        "telegram_nudge_sent": 10,
+        "calendar_event_created": 15,
     }
 
     xp_gained = XP_RULES.get(action, 0)
@@ -164,7 +224,7 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
         )
 
         if last_date == today:
-            pass  # already counted today
+            pass
 
         elif last_date == today - timedelta(days=1):
             streak.current_streak += 1
@@ -182,6 +242,7 @@ async def log_execution_from_agent(payload: dict, db: Session = Depends(get_db))
         "xp_gained": xp_gained,
         "current_streak": streak.current_streak
     }
+
 
 
 

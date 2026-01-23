@@ -1,50 +1,31 @@
 import uuid
 from datetime import datetime, timedelta
 
+from backend.llm_planner import create_plan_with_llm
 
-async def create_plan(user_input: str) -> dict:
+
+# =====================================================
+# RULE-BASED FALLBACK PLANNER
+# =====================================================
+
+async def create_plan_rule_based(user_input: str) -> dict:
     text = user_input.lower()
 
-    # -----------------------------
-    # KEYWORD GROUPS (RULE-BASED)
-    # -----------------------------
-    SCHEDULE_WORDS = [
-        "schedule", "set up", "add", "create", "book", "plan"
-    ]
+    SCHEDULE_WORDS = ["schedule", "set up", "add", "create", "book", "plan"]
+    REMINDER_WORDS = ["remind", "reminder", "notify", "alert"]
+    MEETING_WORDS = ["meeting", "call", "event", "appointment", "session"]
+    TASK_WORDS = ["task", "workout", "gym", "exercise", "todo", "to do"]
+    TIME_WORDS = ["tomorrow", "today", "pm", "am", "at"]
 
-    REMINDER_WORDS = [
-        "remind", "reminder", "notify", "alert"
-    ]
-
-    MEETING_WORDS = [
-        "meeting", "call", "event", "appointment", "session"
-    ]
-
-    TASK_WORDS = [
-        "task", "workout", "gym", "exercise", "todo", "to do"
-    ]
-
-    TIME_WORDS = [
-        "tomorrow", "today", "pm", "am", "at"
-    ]
-
-    # -----------------------------
-    # COMPOSITE TASK + REMINDER + CALENDAR INTENT
-    # -----------------------------
     if (
         any(w in text for w in SCHEDULE_WORDS)
         or any(w in text for w in REMINDER_WORDS)
     ):
-        agents = []
+        agents = ["TaskAgent"]
 
-        # Always treat as a task
-        agents.append("TaskAgent")
-
-        # If reminder intent exists
         if any(w in text for w in REMINDER_WORDS):
             agents.append("NotificationAgent")
 
-        # If time/date semantics exist, attach calendar
         if (
             any(w in text for w in MEETING_WORDS)
             or any(w in text for w in TASK_WORDS)
@@ -52,11 +33,8 @@ async def create_plan(user_input: str) -> dict:
         ):
             agents.append("CalendarAgent")
 
-        # System-level agents (observability & feedback)
-        agents.append("ReportAgent")
-        agents.append("XPAgent")
+        agents.extend(["ReportAgent", "XPAgent"])
 
-        # Basic time defaults (safe, deterministic)
         start = datetime.utcnow() + timedelta(days=1)
         end = start + timedelta(hours=1)
 
@@ -73,32 +51,44 @@ async def create_plan(user_input: str) -> dict:
                 "raw_input": user_input,
                 "title": "NeuroFlow Task / Event",
                 "start": start.isoformat(),
-                "end": end.isoformat()
+                "end": end.isoformat(),
             },
             "priority": "medium",
-            "confidence": 0.9,
-            "reasoning": "User requested a task with reminder and time-based execution",
+            "confidence": 0.7,
+            "reasoning": "Rule-based planner matched scheduling/reminder intent",
             "requires_approval": True,
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": datetime.utcnow().isoformat(),
         }
 
-    # -----------------------------
-    # FALLBACK (SAFE DEFAULT)
-    # -----------------------------
     return {
         "plan_id": str(uuid.uuid4()),
         "intent": "unknown",
         "actions": [],
         "agents": ["ReportAgent"],
-        "params": {
-            "raw_input": user_input
-        },
+        "params": {"raw_input": user_input},
         "priority": "low",
         "confidence": 0.2,
-        "reasoning": "Could not confidently map input to an executable workflow",
+        "reasoning": "No confident rule-based match",
         "requires_approval": False,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.utcnow().isoformat(),
     }
+
+
+# =====================================================
+# MAIN PLANNER ENTRYPOINT (USED BY ROUTES)
+# =====================================================
+
+async def create_plan(user_input: str) -> dict:
+    """
+    Primary planner entrypoint.
+    1. Try LLM planner
+    2. Fallback to rule-based planner if LLM fails
+    """
+    try:
+        return await create_plan_with_llm(user_input)
+    except Exception as e:
+        print("⚠️ LLM planner failed, falling back:", e)
+        return await create_plan_rule_based(user_input)
 
 
 
