@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class NotificationAgent:
+class NotifyAgent:
     name = "NotifyAgent"
 
     async def run(self, user_email: str, message: str, reason: str = None):
