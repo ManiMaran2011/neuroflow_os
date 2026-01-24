@@ -1,25 +1,20 @@
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from resend import Resend
 
+client = Resend(api_key=os.getenv("RESEND_API_KEY"))
 
 def send_email(to_email: str, subject: str, body: str):
-    msg = MIMEMultipart()
-    msg["From"] = os.getenv("EMAIL_FROM")
-    msg["To"] = to_email
-    msg["Subject"] = subject
+    response = client.emails.send({
+        "from": os.getenv("EMAIL_FROM"),
+        "to": [to_email],
+        "subject": subject,
+        "html": f"""
+        <div style="font-family: Arial, sans-serif;">
+            <h2>{subject}</h2>
+            <p>{body}</p>
+        </div>
+        """
+    })
 
-    msg.attach(MIMEText(body, "plain"))
+    return response
 
-    server = smtplib.SMTP(
-        os.getenv("EMAIL_HOST"),
-        int(os.getenv("EMAIL_PORT")),
-    )
-    server.starttls()
-    server.login(
-        os.getenv("EMAIL_USER"),
-        os.getenv("EMAIL_PASSWORD"),
-    )
-    server.send_message(msg)
-    server.quit()
