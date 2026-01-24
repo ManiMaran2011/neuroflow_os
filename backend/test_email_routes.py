@@ -6,7 +6,7 @@ router = APIRouter(prefix="/test", tags=["email"])
 @router.get("/email")
 def test_email():
     send_email(
-        to_email="neuroflow.alerts@gmail.com",
+        to_email="m20maran@gmail.com",
         subject="NeuroFlow Email Test 🚀",
         body="If you got this, Resend email works perfectly."
     )
