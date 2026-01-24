@@ -1,0 +1,16 @@
+name: NeuroFlow Daily Monitor
+
+on:
+  schedule:
+    - cron: "30 15 * * *"   # 9:00 PM IST
+  workflow_dispatch:
+
+jobs:
+  run-monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call daily monitor
+        run: |
+          curl -X POST https://neuroflow-os.onrender.com/monitor/run-daily \
+          -H "Authorization: Bearer ${{ secrets.SYSTEM_MONITOR_TOKEN }}"
