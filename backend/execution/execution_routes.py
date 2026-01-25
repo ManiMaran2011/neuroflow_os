@@ -213,7 +213,7 @@ async def evaluate_progress(
 # ----------------------------------------
 # LIST EXECUTIONS (HISTORY)
 # ----------------------------------------
-@router.get("")
+@router.get("/")
 def list_executions(
     db: Session = Depends(get_db),
     user_email: str = Depends(get_current_user)
