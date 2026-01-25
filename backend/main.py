@@ -16,7 +16,6 @@ from backend.plans.plans_routes import router as plans_router
 from backend.users.user_routes import router as user_router
 from backend.auth.google_oauth_routes import router as google_oauth_router
 from backend.calendar.calendar_routes import router as calendar_router
-from backend.execution.execution_router import router as execution_router
 from backend.monitor.monitor_scheduler import start_monitor_scheduler
 from backend.monitor.monitor_routes import router as monitor_router
 from backend.test_email_routes import router as test_email_router
@@ -64,7 +63,6 @@ app.include_router(plans_router)
 app.include_router(user_router)
 app.include_router(google_oauth_router)
 app.include_router(calendar_router)
-app.include_router(execution_router)
 app.include_router(monitor_router)
 app.include_router(test_email_router)
 
