@@ -27,22 +27,14 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     tokens, cost = estimate_cost(plan.get("reasoning", ""))
 
     # ---------------- NORMALIZE PLAN ----------------
-    # Handles BOTH rule-based planner and LLM planner safely
+    # Handles BOTH rule-based planner 
 
     actions = plan.get("actions")
-    if not actions:
-        # LLM planner case
-        execution_channel = plan.get("execution_channel")
-        actions = [execution_channel] if execution_channel else []
 
     agents = plan.get("agents")
-    if not agents:
-        agents = ["LLMPlanner"]
 
     params = plan.get("params")
-    if not params:
-        # LLM planner may not have params key
-        params = plan
+    
 
     requires_approval = plan.get("requires_approval", False)
 
