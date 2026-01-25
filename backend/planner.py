@@ -44,7 +44,7 @@ async def create_plan_rule_based(user_input: str) -> dict:
             "actions": [
                 "create_task",
                 "schedule_reminder",
-                "create_calendar_event"
+                "create_calendar_event",
             ],
             "agents": agents,
             "params": {
@@ -82,10 +82,32 @@ async def create_plan(user_input: str) -> dict:
     """
     Primary planner entrypoint.
     1. Try LLM planner
-    2. Fallback to rule-based planner if LLM fails
+    2. Normalize output
+    3. Fallback to rule-based planner if LLM fails
     """
     try:
-        return await create_plan_with_llm(user_input)
+        llm_plan = await create_plan_with_llm(user_input)
+
+        # ---------------- NORMALIZE LLM PLAN ----------------
+
+        return {
+            "plan_id": str(uuid.uuid4()),
+            "intent": "llm_routed_execution",
+            "actions": [llm_plan.get("execution_channel")],
+            "agents": ["LLMPlanner", "CalendarAgent"]
+            if llm_plan.get("execution_channel") == "calendar"
+            else ["LLMPlanner"],
+            "params": {
+                "raw_input": user_input,
+                "action": llm_plan.get("action"),
+            },
+            "priority": "medium",
+            "confidence": llm_plan.get("confidence", 0.95),
+            "reasoning": "LLM planner selected execution strategy",
+            "requires_approval": llm_plan.get("requires_approval", False),
+            "created_at": datetime.utcnow().isoformat(),
+        }
+
     except Exception as e:
         print("⚠️ LLM planner failed, falling back:", e)
         return await create_plan_rule_based(user_input)
