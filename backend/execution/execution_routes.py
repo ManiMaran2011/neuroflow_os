@@ -210,6 +210,33 @@ async def evaluate_progress(
         "notification": notification_result
     }
 
+# ----------------------------------------
+# LIST EXECUTIONS (HISTORY)
+# ----------------------------------------
+@router.get("")
+def list_executions(
+    db: Session = Depends(get_db),
+    user_email: str = Depends(get_current_user)
+):
+    executions = (
+        db.query(Execution)
+        .filter(Execution.user_email == user_email)
+        .order_by(Execution.created_at.desc())
+        .limit(50)
+        .all()
+    )
+
+    return [
+        {
+            "execution_id": e.id,
+            "intent": e.intent,
+            "status": e.status,
+            "agents": e.agents,
+            "xp_gained": e.xp_gained,
+            "created_at": e.created_at,
+        }
+        for e in executions
+    ]
 
 
 
