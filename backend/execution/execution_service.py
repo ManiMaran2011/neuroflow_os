@@ -16,23 +16,46 @@ def estimate_cost(user_input: str):
 # CREATE EXECUTION
 # ------------------------------------------------
 def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
+    # ---------------- USER ----------------
     user = db.query(User).filter(User.email == user_email).first()
     if not user:
         user = User(email=user_email)
         db.add(user)
         db.commit()
 
+    # ---------------- COST ----------------
     tokens, cost = estimate_cost(plan.get("reasoning", ""))
 
+    # ---------------- NORMALIZE PLAN ----------------
+    # Handles BOTH rule-based planner and LLM planner safely
+
+    actions = plan.get("actions")
+    if not actions:
+        # LLM planner case
+        execution_channel = plan.get("execution_channel")
+        actions = [execution_channel] if execution_channel else []
+
+    agents = plan.get("agents")
+    if not agents:
+        agents = ["LLMPlanner"]
+
+    params = plan.get("params")
+    if not params:
+        # LLM planner may not have params key
+        params = plan
+
+    requires_approval = plan.get("requires_approval", False)
+
+    # ---------------- EXECUTION ----------------
     execution = Execution(
         id=plan["plan_id"],
         user_email=user_email,
-        intent=plan["intent"],
-        actions=plan["actions"],
-        agents=plan["agents"],
-        params=plan["params"],
-        requires_approval=plan.get("requires_approval", False),
-        status="awaiting_approval" if plan.get("requires_approval") else "created",
+        intent=plan.get("intent", "llm_execution"),
+        actions=actions,
+        agents=agents,
+        params=params,
+        requires_approval=requires_approval,
+        status="awaiting_approval" if requires_approval else "created",
         estimated_tokens=tokens,
         estimated_cost=cost
     )
@@ -41,10 +64,13 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     db.commit()
     db.refresh(execution)
 
-    db.add(ExecutionTimeline(
-        execution_id=execution.id,
-        message=f"Execution created (Est. cost: ${cost})"
-    ))
+    # ---------------- TIMELINE ----------------
+    db.add(
+        ExecutionTimeline(
+            execution_id=execution.id,
+            message=f"Execution created (Est. cost: ${cost})"
+        )
+    )
     db.commit()
 
     return execution
@@ -57,13 +83,16 @@ async def approve_execution(db: Session, execution: Execution):
     execution.status = "executing"
     db.commit()
 
-    db.add(ExecutionTimeline(
-        execution_id=execution.id,
-        message="Execution approved by user"
-    ))
+    db.add(
+        ExecutionTimeline(
+            execution_id=execution.id,
+            message="Execution approved by user"
+        )
+    )
     db.commit()
 
     parent_agent = ParentAgent()
+
     result = await parent_agent.handle(
         db=db,
         execution=execution,
@@ -87,10 +116,12 @@ async def approve_execution(db: Session, execution: Execution):
         user.xp += xp_awarded
         db.commit()
 
-        db.add(ExecutionTimeline(
-            execution_id=execution.id,
-            message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})"
-        ))
+        db.add(
+            ExecutionTimeline(
+                execution_id=execution.id,
+                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})"
+            )
+        )
         db.commit()
 
     return {
@@ -102,5 +133,6 @@ async def approve_execution(db: Session, execution: Execution):
         "estimated_tokens": execution.estimated_tokens,
         "estimated_cost": execution.estimated_cost
     }
+
 
 
