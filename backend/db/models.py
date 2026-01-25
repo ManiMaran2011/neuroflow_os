@@ -66,6 +66,9 @@ class ExecutionTimeline(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     execution_id = Column(String, index=True)
+
+    agent = Column(String, nullable=True)
+    type = Column(String, default="info")
     message = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
