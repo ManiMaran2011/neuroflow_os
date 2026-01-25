@@ -11,7 +11,14 @@ class ParentAgent:
         ))
         db.commit()
 
-        agents = get_agent_instances(execution_plan.get("agents", []))
+        raw_agents = execution_plan.get("agents", [])
+        agents = [
+            a for a in raw_agents
+            if a not in {"LLMPlanner" , "Planner" , "ParentAgent"}
+        ]
+
+        agents = get_agent_instances(agents)
+        
         results = {}
 
         for agent in agents:
