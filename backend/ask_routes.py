@@ -4,10 +4,9 @@ from sqlalchemy.orm import Session
 from backend.db.database import get_db
 from backend.auth.jwt_handler import get_current_user
 from backend.execution.execution_service import create_execution
-from backend.parent_agent import ParentAgent
-from backend.planner import create_plan  
+from backend.planner import create_plan
 
-router = APIRouter()
+router = APIRouter(tags=["ask"])
 
 
 @router.post("/ask")
@@ -16,47 +15,43 @@ async def ask(
     db: Session = Depends(get_db),
     user_email: str = Depends(get_current_user),
 ):
-    user_input = payload.get("input")
-
-    if not user_input:
+    # ---------------- VALIDATION ----------------
+    user_input = payload.get("user_input")
+    if not user_input or not isinstance(user_input, str):
         raise HTTPException(status_code=400, detail="Input missing")
 
-    # ✅ ALWAYS assign plan
-    plan = await create_plan(user_input)
+    # ---------------- PLANNING ----------------
+    try:
+        plan = await create_plan(user_input)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Planner failed: {str(e)}"
+        )
 
-    # ✅ GUARANTEE params exists
-    if "params" not in plan or plan["params"] is None:
-        plan["params"] = {}
+    if not plan or not isinstance(plan, dict):
+        raise HTTPException(
+            status_code=500,
+            detail="Planner returned invalid plan"
+        )
 
-    # attach user context
+    # ---------------- ENRICH PLAN ----------------
+    plan.setdefault("params", {})
     plan["params"]["user_email"] = user_email
 
     # ---------------- CREATE EXECUTION ----------------
     execution = create_execution(
         db=db,
         user_email=user_email,
-        plan=plan,
+        plan=plan
     )
 
-    # ---------------- AUTO EXECUTE IF NO APPROVAL ----------------
-    if not execution.requires_approval:
-        parent_agent = ParentAgent()
-        await parent_agent.handle(
-            db=db,
-            execution=execution,
-            execution_plan={
-                "intent": execution.intent,
-                "actions": execution.actions,
-                "agents": execution.agents,
-                "params": execution.params,
-            },
-            user_input=user_input,
-        )
-
     return {
+        "status": "planned",
         "execution_id": execution.id,
-        "execution_plan": plan,
+        "execution_plan": plan
     }
+
 
 
 
