@@ -28,48 +28,41 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         plan.get("reasoning", plan.get("params", {}).get("raw_input", ""))
     )
 
+    # ---------------- EXECUTION TYPE ----------------
+    execution_type = plan.get("execution_type", "one_time")
+
     # ---------------- ACTIONS ----------------
-    actions = plan.get("actions")
-    if not actions:
-        execution_channel = plan.get("execution_channel")
-        actions = [execution_channel] if execution_channel else []
+    actions = plan.get("actions") or []
 
-    # ---------------- AGENTS (CRITICAL FIX) ----------------
-    agents = plan.get("agents")
+    # ---------------- AGENTS (SANITIZED) ----------------
+    agents = plan.get("agents") or []
 
-    # 🚫 NEVER allow planner names as execution agents
-    if not agents or "LLMPlanner" in agents:
-        channel = plan.get("execution_channel")
+    # NEVER allow planner names as execution agents
+    agents = [a for a in agents if a != "LLMPlanner"]
 
-        if channel == "calendar":
-            agents = [
-                "CalendarAgent",
-                "NotificationAgent",
-                "ReportAgent",
-                "XPAgent"
-            ]
-        elif channel == "email":
-            agents = [
-                "EmailAgent",
-                "ReportAgent",
-                "XPAgent"
-            ]
-        elif channel == "slack":
-            agents = [
-                "SlackAgent",
-                "ReportAgent",
-                "XPAgent"
-            ]
+    if not agents:
+        if execution_type == "tracking":
+            agents = ["MonitorAgent", "NotifyAgent", "XPAgent", "ReportAgent"]
         else:
-            agents = [
-                "ReportAgent",
-                "XPAgent"
-            ]
+            agents = ["ReportAgent", "XPAgent"]
 
     # ---------------- PARAMS ----------------
     params = plan.get("params", {})
+    params.setdefault("execution_type", execution_type)
+    params.setdefault("schedule", plan.get("schedule"))
+    params.setdefault("agent_results", {})
+    params.setdefault("agent_errors", {})
+
     if "action" in plan:
         params["action"] = plan["action"]
+
+    # ---------------- STATUS ----------------
+    if execution_type == "tracking":
+        status = "active"
+        requires_approval = False
+    else:
+        requires_approval = plan.get("requires_approval", False)
+        status = "awaiting_approval" if requires_approval else "created"
 
     # ---------------- EXECUTION ----------------
     execution = Execution(
@@ -79,21 +72,20 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         actions=actions,
         agents=agents,
         params=params,
-        requires_approval=True,
-        status="awaiting_approval",
+        requires_approval=requires_approval,
+        status=status,
         estimated_tokens=tokens,
-        estimated_cost=cost
+        estimated_cost=cost,
     )
 
     db.add(execution)
     db.commit()
     db.refresh(execution)
 
-    # ---------------- TIMELINE ----------------
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message=f"Execution created (Est. cost: ${cost})"
+            message=f"Execution created (type={execution_type}, est cost=${cost})"
         )
     )
     db.commit()
@@ -102,7 +94,7 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 
 
 # ------------------------------------------------
-# APPROVE EXECUTION
+# APPROVE EXECUTION (ONE-TIME ONLY)
 # ------------------------------------------------
 async def approve_execution(db: Session, execution: Execution):
     if execution.status != "awaiting_approval":
@@ -142,12 +134,13 @@ async def approve_execution(db: Session, execution: Execution):
 
     if user:
         user.xp += xp_awarded
+        execution.xp_gained += xp_awarded
         db.commit()
 
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})"
+                message=f"XP awarded: +{xp_awarded}"
             )
         )
         db.commit()

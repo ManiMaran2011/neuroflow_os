@@ -238,6 +238,40 @@ def list_executions(
         for e in executions
     ]
 
+@router.post("/{execution_id}/mark-done")
+def mark_done(
+    execution_id: str,
+    db: Session = Depends(get_db),
+    user_email: str = Depends(get_current_user)
+):
+    execution = db.query(Execution).filter(
+        Execution.id == execution_id,
+        Execution.user_email == user_email
+    ).first()
+
+    if not execution:
+        raise HTTPException(status_code=404, detail="Execution not found")
+
+    if execution.params.get("execution_type") != "tracking":
+        raise HTTPException(status_code=400, detail="Not a tracking execution")
+
+    today = datetime.utcnow().date().isoformat()
+    execution.params["last_completed"] = today
+    execution.xp_gained += 5
+
+    db.add(
+        ExecutionTimeline(
+            execution_id=execution.id,
+            message="User marked task as done (+5 XP)"
+        )
+    )
+
+    db.commit()
+
+    return {
+        "status": "completed_today",
+        "xp_gained": 5
+    }
 
 
 
