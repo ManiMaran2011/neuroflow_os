@@ -1,58 +1,74 @@
-from sqlalchemy.orm import Session
-from fastapi import HTTPException
-import requests
-
+from datetime import datetime
 from backend.db.models import GoogleOAuthToken
-
-GOOGLE_CALENDAR_EVENTS_URL = (
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events"
-)
+from backend.utils.google_calendar import create_calendar_event
 
 
-def execute_calendar_action(
-    *,
-    db: Session,
-    user_email: str,
-    action: dict,
-):
-    token = db.query(GoogleOAuthToken).filter(
-        GoogleOAuthToken.user_email == user_email
-    ).first()
+class CalendarAgent:
+    async def run(self, user_input: str, params: dict):
+        """
+        Creates a Google Calendar event.
+        """
 
-    if not token:
-        raise HTTPException(
-            status_code=400,
-            detail="Google Calendar not connected for user"
-        )
+        # -------- Validate input --------
+        title = params.get("title", "NeuroFlow Event")
+        start = params.get("start")
+        end = params.get("end")
 
-    event_body = {
-        "summary": action.get("summary", "NeuroFlow Event"),
-        "description": action.get("description", ""),
-        "start": {
-            "dateTime": action["start_time"],
-            "timeZone": "Asia/Kolkata",
-        },
-        "end": {
-            "dateTime": action["end_time"],
-            "timeZone": "Asia/Kolkata",
-        },
-    }
+        if not start or not end:
+            return {
+                "status": "error",
+                "effect": "missing_time",
+                "summary": "Could not determine event time",
+                "data": params,
+            }
 
-    headers = {
-        "Authorization": f"Bearer {token.access_token}",
-        "Content-Type": "application/json",
-    }
+        # -------- Fetch OAuth token --------
+        user_email = params.get("user_email")
+        if not user_email:
+            return {
+                "status": "error",
+                "effect": "missing_user",
+                "summary": "User email not provided to CalendarAgent",
+                "data": {},
+            }
 
-    response = requests.post(
-        GOOGLE_CALENDAR_EVENTS_URL,
-        headers=headers,
-        json=event_body,
-    )
+        token = params.get("google_token")
+        if not token:
+            return {
+                "status": "error",
+                "effect": "calendar_not_connected",
+                "summary": "Google Calendar not connected",
+                "data": {},
+            }
 
-    if response.status_code not in (200, 201):
-        raise HTTPException(
-            status_code=400,
-            detail=f"Google Calendar error: {response.text}"
-        )
+        # -------- Create calendar event --------
+        try:
+            event = create_calendar_event(
+                access_token=token,
+                title=title,
+                start=start,
+                end=end,
+            )
 
-    return response.json()
+            return {
+                "status": "success",
+                "effect": "calendar_event_created",
+                "summary": f"Event scheduled from {start} to {end}",
+                "data": {
+                    "event_id": event.get("id"),
+                    "html_link": event.get("htmlLink"),
+                    "start": start,
+                    "end": end,
+                },
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "effect": "calendar_error",
+                "summary": "Failed to create calendar event",
+                "data": {
+                    "error": str(e),
+                },
+            }
+

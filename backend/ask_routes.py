@@ -32,6 +32,9 @@ async def ask(
     user_email: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    plan["params"]["user_email"] = user_email
+    plan["params"]["google_token"] = google_token.access_token if google_token else None
+
     # 1️⃣ CREATE EXECUTION PLAN (IMPORTANT: await)
     plan = await create_plan(req.user_input)
 

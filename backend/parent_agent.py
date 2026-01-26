@@ -5,20 +5,19 @@ import traceback
 
 class ParentAgent:
     async def handle(self, db, execution, execution_plan, user_input):
+        # Ensure container exists
+        if not execution.params:
+            execution.params = {}
+
+        execution.params.setdefault("agent_results", {})
+
         db.add(ExecutionTimeline(
             execution_id=execution.id,
             message="ParentAgent started execution"
         ))
         db.commit()
 
-        raw_agents = execution_plan.get("agents", [])
-        agents = [
-            a for a in raw_agents
-            if a not in {"LLMPlanner" , "Planner" , "ParentAgent"}
-        ]
-
-        agents = get_agent_instances(agents)
-        
+        agents = get_agent_instances(execution_plan.get("agents", []))
         results = {}
 
         for agent in agents:
@@ -26,7 +25,7 @@ class ParentAgent:
 
             db.add(ExecutionTimeline(
                 execution_id=execution.id,
-                message=f"{agent_name} execution started"
+                message=f"{agent_name} started"
             ))
             db.commit()
 
@@ -35,20 +34,42 @@ class ParentAgent:
                     user_input=user_input,
                     params=execution_plan.get("params", {})
                 )
+
+                # 🔑 Enforce contract
+                if not isinstance(result, dict):
+                    raise ValueError("Agent did not return dict")
+
+                results[agent_name] = result
+
+                # 🔥 Persist agent output
+                execution.params["agent_results"][agent_name] = result
+                db.commit()
+
+                # 🔥 Human-readable timeline
+                summary = result.get("summary")
+                if summary:
+                    db.add(ExecutionTimeline(
+                        execution_id=execution.id,
+                        message=f"{agent_name}: {summary}"
+                    ))
+                    db.commit()
+
             except Exception as e:
-                result = {
+                error_result = {
                     "status": "error",
-                    "error": str(e),
+                    "effect": "agent_failed",
+                    "summary": str(e),
                     "traceback": traceback.format_exc()
                 }
 
-            results[agent_name] = result
+                execution.params["agent_results"][agent_name] = error_result
+                db.commit()
 
-            db.add(ExecutionTimeline(
-                execution_id=execution.id,
-                message=f"{agent_name} execution completed"
-            ))
-            db.commit()
+                db.add(ExecutionTimeline(
+                    execution_id=execution.id,
+                    message=f"{agent_name} failed: {str(e)}"
+                ))
+                db.commit()
 
         execution.status = "executed"
         db.commit()
@@ -57,6 +78,7 @@ class ParentAgent:
             "status": "executed",
             "results": results
         }
+
 
 
 

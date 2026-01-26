@@ -1,55 +1,57 @@
 from backend.utils.email import send_email
-from backend.agents.base_agent import BaseAgent
 
 
-class NotifyAgent(BaseAgent):
-    name = "NotifyAgent"
-
-    async def run(self, user_email: str, context: dict) -> dict:
+class NotifyAgent:
+    async def run(self, user_input: str, params: dict):
         """
-        Sends reminder + motivational email to user.
+        Sends an email notification / reminder.
         """
 
-        intent = context.get("intent", "general")
-        missed_days = context.get("missed_days", 0)
+        user_email = params.get("user_email")
+        reminder_time = params.get("reminder_time")
 
-        # -------------------------
-        # MESSAGE LOGIC
-        # -------------------------
-        if missed_days >= 2:
-            subject = "Let’s get back on track 💪"
-            body = (
-                f"Hey 👋\n\n"
-                f"You’ve missed {missed_days} days recently.\n"
-                f"No stress — progress isn’t about perfection.\n\n"
-                f"Do one small thing today and you’re back in the game 🚀\n\n"
-                f"— NeuroFlow"
-            )
-            action = "motivational_nudge_sent"
+        if not user_email:
+            return {
+                "status": "error",
+                "effect": "missing_user",
+                "summary": "No user email provided for notification",
+                "data": {},
+            }
 
-        else:
-            subject = "Quick reminder ⏰"
-            body = (
-                f"Hey 👋\n\n"
-                f"Just checking in — did you complete today’s task?\n\n"
-                f"Consistency beats intensity 💯\n\n"
-                f"— NeuroFlow"
-            )
-            action = "reminder_sent"
-
-        # -------------------------
-        # SEND EMAIL
-        # -------------------------
-        send_email(
-            to_email=user_email,
-            subject=subject,
-            body=body
+        subject = "⏰ NeuroFlow Reminder"
+        body = (
+            "Hey 👋\n\n"
+            "Just a reminder about your upcoming task or meeting.\n\n"
+            "You've got this 💪\n\n"
+            "— NeuroFlow OS"
         )
 
-        return {
-            "agent": self.name,
-            "action": action,
-            "channel": "email",
-            "user_email": user_email
-        }
+        try:
+            send_email(
+                to_email=user_email,
+                subject=subject,
+                body=body,
+            )
+
+            return {
+                "status": "success",
+                "effect": "notification_sent",
+                "summary": "Reminder email sent successfully",
+                "data": {
+                    "channel": "email",
+                    "to": user_email,
+                    "scheduled_for": reminder_time,
+                },
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "effect": "email_failed",
+                "summary": "Failed to send reminder email",
+                "data": {
+                    "error": str(e),
+                },
+            }
+
 
