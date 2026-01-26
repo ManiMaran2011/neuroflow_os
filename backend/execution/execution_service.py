@@ -24,33 +24,52 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         db.commit()
 
     # ---------------- COST ----------------
-    tokens, cost = estimate_cost(plan.get("reasoning", plan.get("params", {}).get("raw_input", "")))
+    tokens, cost = estimate_cost(
+        plan.get("reasoning", plan.get("params", {}).get("raw_input", ""))
+    )
 
-    # ---------------- NORMALIZE PLAN ----------------
-
-    # ACTIONS
+    # ---------------- ACTIONS ----------------
     actions = plan.get("actions")
     if not actions:
         execution_channel = plan.get("execution_channel")
         actions = [execution_channel] if execution_channel else []
 
-    # AGENTS
+    # ---------------- AGENTS (CRITICAL FIX) ----------------
     agents = plan.get("agents")
-    if not agents:
-        channel = plan.get("execution_channel")
-        if channel == "calendar":
-            agents = ["CalendarAgent", "NotificationAgent", "ReportAgent", "XPAgent"]
-        elif channel == "email":
-            agents = ["EmailAgent", "ReportAgent", "XPAgent"]
-        else:
-            agents = ["ReportAgent", "XPAgent"]
 
-    # PARAMS
+    # 🚫 NEVER allow planner names as execution agents
+    if not agents or "LLMPlanner" in agents:
+        channel = plan.get("execution_channel")
+
+        if channel == "calendar":
+            agents = [
+                "CalendarAgent",
+                "NotificationAgent",
+                "ReportAgent",
+                "XPAgent"
+            ]
+        elif channel == "email":
+            agents = [
+                "EmailAgent",
+                "ReportAgent",
+                "XPAgent"
+            ]
+        elif channel == "slack":
+            agents = [
+                "SlackAgent",
+                "ReportAgent",
+                "XPAgent"
+            ]
+        else:
+            agents = [
+                "ReportAgent",
+                "XPAgent"
+            ]
+
+    # ---------------- PARAMS ----------------
     params = plan.get("params", {})
     if "action" in plan:
         params["action"] = plan["action"]
-
-    requires_approval = plan.get("requires_approval", True)
 
     # ---------------- EXECUTION ----------------
     execution = Execution(
@@ -60,7 +79,7 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         actions=actions,
         agents=agents,
         params=params,
-        requires_approval=requires_approval,
+        requires_approval=True,
         status="awaiting_approval",
         estimated_tokens=tokens,
         estimated_cost=cost
@@ -142,6 +161,7 @@ async def approve_execution(db: Session, execution: Execution):
         "estimated_tokens": execution.estimated_tokens,
         "estimated_cost": execution.estimated_cost
     }
+
 
 
 
