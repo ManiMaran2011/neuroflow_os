@@ -1,18 +1,22 @@
 from backend.agent_registry import get_agent_instances
 from backend.db.models import ExecutionTimeline
 import traceback
+import copy
 
 
 class ParentAgent:
     async def handle(self, db, execution, execution_plan, user_input):
-        # ---------------- INIT RUNTIME STATE ----------------
-        if execution.params is None:
-            execution.params = {}
 
-        # 🔑 CRITICAL FIX
-        execution.params.setdefault("agent_results", {})
-        execution.params.setdefault("agent_errors", {})
+        # ---------------- INIT RUNTIME STATE (SAFE) ----------------
+        base_params = execution.params or {}
 
+        # 🔥 IMPORTANT: create a NEW dict (not mutate in-place)
+        runtime_params = copy.deepcopy(base_params)
+
+        runtime_params["agent_results"] = {}
+        runtime_params["agent_errors"] = {}
+
+        execution.params = runtime_params
         db.commit()
 
         db.add(
@@ -42,8 +46,10 @@ class ParentAgent:
                     params=execution_plan.get("params", {})
                 )
 
-                # ✅ STORE RESULT
-                execution.params["agent_results"][agent_name] = result
+                # 🔥 REASSIGN JSON (critical)
+                params = copy.deepcopy(execution.params)
+                params["agent_results"][agent_name] = result
+                execution.params = params
                 db.commit()
 
                 db.add(
@@ -61,8 +67,9 @@ class ParentAgent:
                     "traceback": traceback.format_exc()
                 }
 
-                # ✅ STORE ERROR
-                execution.params["agent_errors"][agent_name] = error_result
+                params = copy.deepcopy(execution.params)
+                params["agent_errors"][agent_name] = error_result
+                execution.params = params
                 db.commit()
 
                 db.add(
@@ -75,9 +82,10 @@ class ParentAgent:
 
         return {
             "status": "executed",
-            "results": execution.params["agent_results"],
-            "errors": execution.params["agent_errors"]
+            "results": execution.params.get("agent_results", {}),
+            "errors": execution.params.get("agent_errors", {})
         }
+
 
 
 
