@@ -6,8 +6,8 @@ from backend.parent_agent import ParentAgent
 # -------------------------
 # SIMPLE COST ESTIMATION
 # -------------------------
-def estimate_cost(user_input: str):
-    estimated_tokens = max(100, len(user_input.split()) * 10)
+def estimate_cost(text: str):
+    estimated_tokens = max(100, len(text.split()) * 10)
     estimated_cost = round((estimated_tokens / 1000) * 0.01, 4)
     return estimated_tokens, estimated_cost
 
@@ -24,30 +24,44 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         db.commit()
 
     # ---------------- COST ----------------
-    tokens, cost = estimate_cost(plan.get("reasoning", ""))
+    tokens, cost = estimate_cost(plan.get("reasoning", plan.get("params", {}).get("raw_input", "")))
 
     # ---------------- NORMALIZE PLAN ----------------
-    # Handles BOTH rule-based planner 
 
+    # ACTIONS
     actions = plan.get("actions")
+    if not actions:
+        execution_channel = plan.get("execution_channel")
+        actions = [execution_channel] if execution_channel else []
 
+    # AGENTS
     agents = plan.get("agents")
+    if not agents:
+        channel = plan.get("execution_channel")
+        if channel == "calendar":
+            agents = ["CalendarAgent", "NotificationAgent", "ReportAgent", "XPAgent"]
+        elif channel == "email":
+            agents = ["EmailAgent", "ReportAgent", "XPAgent"]
+        else:
+            agents = ["ReportAgent", "XPAgent"]
 
-    params = plan.get("params")
-    
+    # PARAMS
+    params = plan.get("params", {})
+    if "action" in plan:
+        params["action"] = plan["action"]
 
-    requires_approval = plan.get("requires_approval", False)
+    requires_approval = plan.get("requires_approval", True)
 
     # ---------------- EXECUTION ----------------
     execution = Execution(
         id=plan["plan_id"],
         user_email=user_email,
-        intent=plan.get("intent", "llm_execution"),
+        intent=plan.get("intent", "agentic_execution"),
         actions=actions,
         agents=agents,
         params=params,
         requires_approval=requires_approval,
-        status="awaiting_approval" if requires_approval else "created",
+        status="awaiting_approval",
         estimated_tokens=tokens,
         estimated_cost=cost
     )
@@ -72,6 +86,9 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 # APPROVE EXECUTION
 # ------------------------------------------------
 async def approve_execution(db: Session, execution: Execution):
+    if execution.status != "awaiting_approval":
+        raise ValueError(f"Execution is in '{execution.status}' state")
+
     execution.status = "executing"
     db.commit()
 
@@ -94,7 +111,7 @@ async def approve_execution(db: Session, execution: Execution):
             "agents": execution.agents,
             "params": execution.params
         },
-        user_input=None
+        user_input=execution.params.get("raw_input")
     )
 
     execution.status = "executed"
@@ -125,6 +142,7 @@ async def approve_execution(db: Session, execution: Execution):
         "estimated_tokens": execution.estimated_tokens,
         "estimated_cost": execution.estimated_cost
     }
+
 
 
 

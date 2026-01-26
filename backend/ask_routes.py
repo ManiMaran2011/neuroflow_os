@@ -29,15 +29,20 @@ async def ask(
             detail=f"Planner failed: {str(e)}"
         )
 
-    if not plan or not isinstance(plan, dict):
+    if not isinstance(plan, dict):
         raise HTTPException(
             status_code=500,
             detail="Planner returned invalid plan"
         )
 
-    # ---------------- ENRICH PLAN ----------------
+    # ---------------- ENFORCE APPROVAL ----------------
+    # Any real-world execution MUST require approval
+    plan["requires_approval"] = True
+
+    # ---------------- NORMALIZE PARAMS ----------------
     plan.setdefault("params", {})
     plan["params"]["user_email"] = user_email
+    plan["params"]["raw_input"] = user_input
 
     # ---------------- CREATE EXECUTION ----------------
     execution = create_execution(
@@ -47,10 +52,11 @@ async def ask(
     )
 
     return {
-        "status": "planned",
+        "status": "awaiting_approval",
         "execution_id": execution.id,
         "execution_plan": plan
     }
+
 
 
 
