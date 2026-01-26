@@ -1,72 +1,63 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from backend.auth.jwt_handler import get_current_user
 from backend.db.database import get_db
-from backend.planner import create_plan
+from backend.auth.jwt_handler import get_current_user
 from backend.execution.execution_service import create_execution
 from backend.parent_agent import ParentAgent
+from backend.planner import create_plan  
+
+router = APIRouter()
 
 
-router = APIRouter(
-    prefix="/ask",
-    tags=["ask"]
-)
-
-
-# ---------------------------
-# Request Schema
-# ---------------------------
-class AskRequest(BaseModel):
-    user_input: str
-    approved: bool = False
-
-
-# ---------------------------
-# Ask Route
-# ---------------------------
-@router.post("")
+@router.post("/ask")
 async def ask(
-    req: AskRequest,
+    payload: dict,
+    db: Session = Depends(get_db),
     user_email: str = Depends(get_current_user),
-    db: Session = Depends(get_db)
 ):
+    user_input = payload.get("input")
+
+    if not user_input:
+        raise HTTPException(status_code=400, detail="Input missing")
+
+    # ✅ ALWAYS assign plan
+    plan = await create_plan(user_input)
+
+    # ✅ GUARANTEE params exists
+    if "params" not in plan or plan["params"] is None:
+        plan["params"] = {}
+
+    # attach user context
     plan["params"]["user_email"] = user_email
-    plan["params"]["google_token"] = google_token.access_token if google_token else None
 
-    # 1️⃣ CREATE EXECUTION PLAN (IMPORTANT: await)
-    plan = await create_plan(req.user_input)
-
-    # 2️⃣ CREATE EXECUTION (persisted to DB)
+    # ---------------- CREATE EXECUTION ----------------
     execution = create_execution(
         db=db,
         user_email=user_email,
-        plan=plan
+        plan=plan,
     )
 
-    # 3️⃣ APPROVAL GATE
-    if execution.requires_approval and not req.approved:
-        return {
-            "status": "awaiting_approval",
-            "execution_id": execution.id,
-            "execution_plan": plan
-        }
-
-    # 4️⃣ EXECUTE VIA PARENT AGENT
-    parent_agent = ParentAgent()
-    result = await parent_agent.handle(
-        db=db,
-        execution=execution,
-        execution_plan=plan,
-        user_input=req.user_input
-    )
+    # ---------------- AUTO EXECUTE IF NO APPROVAL ----------------
+    if not execution.requires_approval:
+        parent_agent = ParentAgent()
+        await parent_agent.handle(
+            db=db,
+            execution=execution,
+            execution_plan={
+                "intent": execution.intent,
+                "actions": execution.actions,
+                "agents": execution.agents,
+                "params": execution.params,
+            },
+            user_input=user_input,
+        )
 
     return {
-        "status": "executed",
         "execution_id": execution.id,
-        "result": result
+        "execution_plan": plan,
     }
+
 
 
 
