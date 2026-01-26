@@ -13,6 +13,53 @@ def estimate_cost(text: str):
 
 
 # ------------------------------------------------
+# AGENT INJECTION LOGIC (🔥 CORE FIX)
+# ------------------------------------------------
+def resolve_agents(plan: dict) -> list[str]:
+    """
+    Decide which agents should execute.
+    Planner NEVER decides agents.
+    """
+
+    execution_type = plan.get("execution_type")
+    channel = plan.get("execution_channel")
+
+    # ---- TRACKED / HABIT / FITNESS ----
+    if execution_type == "tracked_goal":
+        return [
+            "CalendarAgent",      # real (schedule reminders)
+            "MonitorAgent",       # real (daily cron tracking)
+            "TaskAgent",          # simulated
+            "NotificationAgent",  # simulated (UI + email handled elsewhere)
+            "ReportAgent",        # simulated
+            "XPAgent"             # simulated
+        ]
+
+    # ---- ONE-TIME TASK ----
+    if execution_type == "instant_task":
+        if channel == "calendar":
+            return [
+                "CalendarAgent",
+                "TaskAgent",
+                "XPAgent",
+                "ReportAgent"
+            ]
+        if channel == "email":
+            return [
+                "EmailAgent",
+                "XPAgent",
+                "ReportAgent"
+            ]
+
+    # ---- FALLBACK ----
+    return [
+        "TaskAgent",
+        "ReportAgent",
+        "XPAgent"
+    ]
+
+
+# ------------------------------------------------
 # CREATE EXECUTION
 # ------------------------------------------------
 def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
@@ -28,43 +75,27 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         plan.get("reasoning", plan.get("params", {}).get("raw_input", ""))
     )
 
-    # ---------------- EXECUTION TYPE ----------------
-    execution_type = plan.get("execution_type", "one_time")
+    # ---------------- AGENTS (AUTHORITATIVE) ----------------
+    agents = resolve_agents(plan)
 
     # ---------------- ACTIONS ----------------
-    actions = plan.get("actions") or []
-
-    # ---------------- AGENTS (SANITIZED) ----------------
-    agents = plan.get("agents") or []
-
-    # NEVER allow planner names as execution agents
-    agents = [a for a in agents if a != "LLMPlanner"]
-
-    if not agents:
-        if execution_type == "tracking":
-            agents = ["MonitorAgent", "NotifyAgent", "XPAgent", "ReportAgent"]
-        else:
-            agents = ["ReportAgent", "XPAgent"]
+    actions = plan.get("actions", [])
+    if not actions:
+        channel = plan.get("execution_channel")
+        actions = [channel] if channel else []
 
     # ---------------- PARAMS ----------------
-    params = plan.get("params", {})
-    params.setdefault("execution_type", execution_type)
-    params.setdefault("schedule", plan.get("schedule"))
+    params = plan.get("params", {}).copy()
+
+    # Always initialize agent bookkeeping (fixes KeyError crashes)
     params.setdefault("agent_results", {})
     params.setdefault("agent_errors", {})
-
-    if "action" in plan:
-        params["action"] = plan["action"]
-
-    # ---------------- STATUS ----------------
-    if execution_type == "tracking":
-        status = "active"
-        requires_approval = False
-    else:
-        requires_approval = plan.get("requires_approval", False)
-        status = "awaiting_approval" if requires_approval else "created"
+    params["execution_type"] = plan.get("execution_type")
+    params["schedule"] = plan.get("schedule")
 
     # ---------------- EXECUTION ----------------
+    requires_approval = plan.get("requires_approval", True)
+
     execution = Execution(
         id=plan["plan_id"],
         user_email=user_email,
@@ -73,19 +104,20 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         agents=agents,
         params=params,
         requires_approval=requires_approval,
-        status=status,
+        status="awaiting_approval" if requires_approval else "created",
         estimated_tokens=tokens,
-        estimated_cost=cost,
+        estimated_cost=cost
     )
 
     db.add(execution)
     db.commit()
     db.refresh(execution)
 
+    # ---------------- TIMELINE ----------------
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message=f"Execution created (type={execution_type}, est cost=${cost})"
+            message=f"Execution created (Est. cost: ${cost})"
         )
     )
     db.commit()
@@ -94,7 +126,7 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 
 
 # ------------------------------------------------
-# APPROVE EXECUTION (ONE-TIME ONLY)
+# APPROVE EXECUTION
 # ------------------------------------------------
 async def approve_execution(db: Session, execution: Execution):
     if execution.status != "awaiting_approval":
@@ -134,13 +166,12 @@ async def approve_execution(db: Session, execution: Execution):
 
     if user:
         user.xp += xp_awarded
-        execution.xp_gained += xp_awarded
         db.commit()
 
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message=f"XP awarded: +{xp_awarded}"
+                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})"
             )
         )
         db.commit()
@@ -154,6 +185,7 @@ async def approve_execution(db: Session, execution: Execution):
         "estimated_tokens": execution.estimated_tokens,
         "estimated_cost": execution.estimated_cost
     }
+
 
 
 
