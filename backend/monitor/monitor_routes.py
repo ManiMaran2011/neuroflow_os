@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from datetime import datetime
+import threading
 
 from backend.db.database import get_db
 from backend.db.models import Execution, ExecutionTimeline
@@ -71,7 +72,7 @@ def run_daily_monitor(db: Session = Depends(get_db)):
             execution_id=execution.id,
             user_email=execution.user_email,
             action="mark_done",
-            expires_in_minutes=24 * 60  # valid for 1 day
+            expires_in_minutes=24 * 60  # 1 day validity
         )
 
         mark_done_url = f"{base_url}/magic/mark-done?token={token}"
@@ -112,13 +113,17 @@ def run_daily_monitor(db: Session = Depends(get_db)):
         """
 
         # --------------------------------
-        # 🔔 SEND EMAIL
+        # 🔔 SEND EMAIL (NON-BLOCKING)
         # --------------------------------
-        send_email(
-            to_email=execution.user_email,
-            subject=subject,
-            body=body
-        )
+        threading.Thread(
+            target=send_email,
+            kwargs={
+                "to_email": execution.user_email,
+                "subject": subject,
+                "body": body
+            },
+            daemon=True
+        ).start()
 
         # --------------------------------
         # 🧠 TIMELINE LOG
@@ -126,7 +131,7 @@ def run_daily_monitor(db: Session = Depends(get_db)):
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message="Daily progress reminder sent (magic link)"
+                message="Daily progress reminder sent (magic link, async)"
             )
         )
 
@@ -143,6 +148,7 @@ def run_daily_monitor(db: Session = Depends(get_db)):
         "checked_executions": len(results),
         "results": results
     }
+
 
 
 
