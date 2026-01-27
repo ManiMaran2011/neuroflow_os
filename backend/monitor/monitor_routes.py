@@ -5,6 +5,7 @@ from datetime import datetime
 from backend.db.database import get_db
 from backend.db.models import Execution, ExecutionTimeline
 from backend.utils.email import send_email
+from backend.utils.magic_links import create_magic_token
 
 router = APIRouter(
     prefix="/monitor",
@@ -30,12 +31,12 @@ def verify_system_token(authorization: str = Header(...)):
 def run_daily_monitor(db: Session = Depends(get_db)):
     """
     Runs daily monitoring for all ACTIVE tracking executions.
-    Triggered by Render cron.
+    Triggered by cron (Render / GitHub Actions).
     """
 
     today = datetime.utcnow().date().isoformat()
 
-    # 🔍 Fetch ACTIVE tracking executions
+    # 🔍 Fetch ACTIVE executions
     executions = (
         db.query(Execution)
         .filter(Execution.status == "active")
@@ -53,7 +54,7 @@ def run_daily_monitor(db: Session = Depends(get_db)):
 
         last_completed = params.get("last_completed")
 
-        # ✅ Already completed today → no reminder
+        # ✅ Already completed today → skip reminder
         if last_completed == today:
             results.append({
                 "execution_id": execution.id,
@@ -62,15 +63,22 @@ def run_daily_monitor(db: Session = Depends(get_db)):
             continue
 
         # --------------------------------
-        # 📧 ACTIONABLE EMAIL (MARK DONE)
+        # 🔐 CREATE MAGIC LINK
         # --------------------------------
         base_url = "https://neuroflow-os.onrender.com"
 
-        mark_done_url = (
-            f"{base_url}/executions/"
-            f"{execution.id}/mark-done"
+        token = create_magic_token(
+            execution_id=execution.id,
+            user_email=execution.user_email,
+            action="mark_done",
+            expires_in_minutes=24 * 60  # valid for 1 day
         )
 
+        mark_done_url = f"{base_url}/magic/mark-done?token={token}"
+
+        # --------------------------------
+        # 📧 EMAIL CONTENT (HTML)
+        # --------------------------------
         subject = "🧠 NeuroFlow Daily Check-in"
 
         body = f"""
@@ -88,13 +96,14 @@ def run_daily_monitor(db: Session = Depends(get_db)):
                text-decoration:none;
                border-radius:8px;
                font-weight:600;
+               font-size:15px;
              ">
              ✅ Mark Done
           </a>
         </p>
 
         <p style="margin-top:12px;color:#666;font-size:14px;">
-          Click once to log your progress and earn XP ⚡
+          One click. No login. XP awarded instantly ⚡
         </p>
 
         <p style="margin-top:20px;">
@@ -102,18 +111,22 @@ def run_daily_monitor(db: Session = Depends(get_db)):
         </p>
         """
 
+        # --------------------------------
         # 🔔 SEND EMAIL
+        # --------------------------------
         send_email(
             to_email=execution.user_email,
             subject=subject,
             body=body
         )
 
+        # --------------------------------
         # 🧠 TIMELINE LOG
+        # --------------------------------
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message="Daily progress check-in email sent"
+                message="Daily progress reminder sent (magic link)"
             )
         )
 
@@ -130,5 +143,6 @@ def run_daily_monitor(db: Session = Depends(get_db)):
         "checked_executions": len(results),
         "results": results
     }
+
 
 
