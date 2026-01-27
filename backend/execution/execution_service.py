@@ -13,40 +13,14 @@ def estimate_cost(text: str):
 
 
 # ------------------------------------------------
-# AGENT INJECTION LOGIC
-# ------------------------------------------------
-def resolve_agents(plan: dict) -> list[str]:
-    """
-    Decide which agents should execute.
-    Planner NEVER decides agents.
-    """
-
-    execution_type = plan.get("execution_type")
-    channel = plan.get("execution_channel")
-
-    # ---- TRACKING / HABITS / FITNESS ----
-    if execution_type in ["tracked_goal", "tracking"]:
-        return [
-            "MonitorAgent",   # daily cron monitoring
-            "ReportAgent",
-            "XPAgent",
-        ]
-
-    # ---- ONE-TIME TASK ----
-    if execution_type == "instant_task":
-        if channel == "calendar":
-            return ["CalendarAgent", "XPAgent", "ReportAgent"]
-        if channel == "email":
-            return ["NotifyAgent", "XPAgent", "ReportAgent"]
-
-    # ---- FALLBACK ----
-    return ["ReportAgent", "XPAgent"]
-
-
-# ------------------------------------------------
-# CREATE EXECUTION (🔥 FINAL FIX)
+# CREATE EXECUTION (PLANNER IS AUTHORITATIVE)
 # ------------------------------------------------
 def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
+    """
+    Creates an Execution strictly from the planner output.
+    NO reinterpretation.
+    """
+
     # ---------------- USER ----------------
     user = db.query(User).filter(User.email == user_email).first()
     if not user:
@@ -56,52 +30,38 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 
     # ---------------- COST ----------------
     tokens, cost = estimate_cost(
-        plan.get("reasoning", plan.get("params", {}).get("raw_input", ""))
+        plan.get("params", {}).get("raw_input", "")
     )
 
-    # ---------------- AGENTS ----------------
-    agents = resolve_agents(plan)
+    # ---------------- STATUS ----------------
+    execution_type = plan.get("execution_type")
 
-    # ---------------- ACTIONS ----------------
-    actions = plan.get("actions", [])
-    if not actions:
-        channel = plan.get("execution_channel")
-        actions = [channel] if channel else []
-
-    # ---------------- PARAMS ----------------
-    params = plan.get("params", {}).copy()
-    params.setdefault("agent_results", {})
-    params.setdefault("agent_errors", {})
-
-    # 🔥 TRACKING DETECTION (CRITICAL)
-    is_tracking = plan.get("execution_type") in ["tracked_goal", "tracking"]
-
-    if is_tracking:
-        # MUST MATCH cron filter
-        params["execution_type"] = "tracking"
-        params.setdefault("last_completed", None)
+    if execution_type == "tracking":
+        status = "active"              # 🔥 cron depends on this
+    elif plan.get("requires_approval", True):
+        status = "awaiting_approval"
     else:
-        params["execution_type"] = plan.get("execution_type")
-
-    params["schedule"] = plan.get("schedule")
+        status = "executing"
 
     # ---------------- EXECUTION ----------------
-    # 🔥 FORCE APPROVAL FOR TRACKING (demo-friendly)
-    requires_approval = True if is_tracking else plan.get(
-        "requires_approval", True
-    )
-
     execution = Execution(
         id=plan["plan_id"],
         user_email=user_email,
         intent=plan.get("intent", "agentic_execution"),
-        actions=actions,
-        agents=agents,
-        params=params,
-        requires_approval=requires_approval,
-        status="awaiting_approval" if requires_approval else "created",
+        actions=plan.get("actions", []),
+        agents=plan.get("agents", []),            # ✅ TRUST PLANNER
+        params={
+            **plan.get("params", {}),
+            "execution_type": execution_type,
+            "execution_channel": plan.get("execution_channel"),
+            "agent_results": {},
+            "agent_errors": {}
+        },
+        status=status,
+        requires_approval=plan.get("requires_approval", True),
         estimated_tokens=tokens,
         estimated_cost=cost,
+        xp_gained=0
     )
 
     db.add(execution)
@@ -112,11 +72,7 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message=(
-                "Tracking execution created (awaiting approval)"
-                if is_tracking
-                else f"Execution created (Est. cost: ${cost})"
-            ),
+            message=f"Execution created ({execution.intent})"
         )
     )
     db.commit()
@@ -125,74 +81,81 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 
 
 # ------------------------------------------------
-# APPROVE EXECUTION
+# APPROVE EXECUTION (RUN AGENTS)
 # ------------------------------------------------
 async def approve_execution(db: Session, execution: Execution):
-    if execution.status != "awaiting_approval":
-        raise ValueError(f"Execution is in '{execution.status}' state")
+    """
+    Executes agents exactly as planner defined.
+    """
 
-    # 🔥 AFTER APPROVAL:
-    # - tracking → active
-    # - one-time → executing
-    is_tracking = execution.params.get("execution_type") == "tracking"
+    if execution.status not in ["awaiting_approval", "active"]:
+        raise ValueError(
+            f"Execution is in '{execution.status}' state"
+        )
 
-    execution.status = "active" if is_tracking else "executing"
+    execution.status = "executing"
     db.commit()
 
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message="Execution approved by user",
+            message="Execution approved by user"
         )
     )
     db.commit()
 
-    # ---- RUN AGENTS FOR NON-TRACKING ----
-    if not is_tracking:
-        parent_agent = ParentAgent()
+    # ---------------- RUN AGENTS ----------------
+    parent_agent = ParentAgent()
 
-        result = await parent_agent.handle(
-            db=db,
-            execution=execution,
-            execution_plan={
-                "intent": execution.intent,
-                "actions": execution.actions,
-                "agents": execution.agents,
-                "params": execution.params,
-            },
-            user_input=execution.params.get("raw_input"),
-        )
+    result = await parent_agent.handle(
+        db=db,
+        execution=execution,
+        execution_plan={
+            "intent": execution.intent,
+            "actions": execution.actions,
+            "agents": execution.agents,
+            "params": execution.params
+        },
+        user_input=execution.params.get("raw_input")
+    )
 
-        execution.status = "executed"
-        db.commit()
+    # ---------------- FINAL STATUS ----------------
+    if execution.params.get("execution_type") == "tracking":
+        execution.status = "active"     # stays active for cron
     else:
-        result = {"status": "tracking_activated"}
+        execution.status = "executed"
 
-    # ---------------- XP ----------------
-    user = db.query(User).filter(User.email == execution.user_email).first()
+    # ---------------- XP (ALWAYS AWARD) ----------------
+    user = db.query(User).filter(
+        User.email == execution.user_email
+    ).first()
+
     xp_awarded = 15
+    execution.xp_gained = xp_awarded
 
     if user:
         user.xp += xp_awarded
-        db.commit()
 
-        db.add(
-            ExecutionTimeline(
-                execution_id=execution.id,
-                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})",
-            )
+    db.commit()
+
+    db.add(
+        ExecutionTimeline(
+            execution_id=execution.id,
+            message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp if user else 'N/A'})"
         )
-        db.commit()
+    )
+    db.commit()
 
     return {
         "status": execution.status,
         "execution_id": execution.id,
         "result": result,
-        "xp_awarded": xp_awarded,
+        "xp_gained": xp_awarded,
         "total_xp": user.xp if user else None,
         "estimated_tokens": execution.estimated_tokens,
-        "estimated_cost": execution.estimated_cost,
+        "estimated_cost": execution.estimated_cost
     }
+
 
 
 
