@@ -13,7 +13,7 @@ def estimate_cost(text: str):
 
 
 # ------------------------------------------------
-# AGENT INJECTION LOGIC (🔥 CORE FIX)
+# AGENT INJECTION LOGIC
 # ------------------------------------------------
 def resolve_agents(plan: dict) -> list[str]:
     """
@@ -25,42 +25,26 @@ def resolve_agents(plan: dict) -> list[str]:
     channel = plan.get("execution_channel")
 
     # ---- TRACKED / HABIT / FITNESS ----
-    if execution_type == "tracked_goal":
+    if execution_type in ["tracked_goal", "tracking"]:
         return [
-            "CalendarAgent",      # real (schedule reminders)
             "MonitorAgent",       # real (daily cron tracking)
-            "TaskAgent",          # simulated
-            "NotificationAgent",  # simulated (UI + email handled elsewhere)
-            "ReportAgent",        # simulated
-            "XPAgent"             # simulated
+            "ReportAgent",
+            "XPAgent"
         ]
 
     # ---- ONE-TIME TASK ----
     if execution_type == "instant_task":
         if channel == "calendar":
-            return [
-                "CalendarAgent",
-                "TaskAgent",
-                "XPAgent",
-                "ReportAgent"
-            ]
+            return ["CalendarAgent", "XPAgent", "ReportAgent"]
         if channel == "email":
-            return [
-                "EmailAgent",
-                "XPAgent",
-                "ReportAgent"
-            ]
+            return ["NotifyAgent", "XPAgent", "ReportAgent"]
 
     # ---- FALLBACK ----
-    return [
-        "TaskAgent",
-        "ReportAgent",
-        "XPAgent"
-    ]
+    return ["ReportAgent", "XPAgent"]
 
 
 # ------------------------------------------------
-# CREATE EXECUTION
+# CREATE EXECUTION (🔥 FIXED)
 # ------------------------------------------------
 def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     # ---------------- USER ----------------
@@ -75,7 +59,7 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         plan.get("reasoning", plan.get("params", {}).get("raw_input", ""))
     )
 
-    # ---------------- AGENTS (AUTHORITATIVE) ----------------
+    # ---------------- AGENTS ----------------
     agents = resolve_agents(plan)
 
     # ---------------- ACTIONS ----------------
@@ -86,11 +70,18 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
 
     # ---------------- PARAMS ----------------
     params = plan.get("params", {}).copy()
-
-    # Always initialize agent bookkeeping (fixes KeyError crashes)
     params.setdefault("agent_results", {})
     params.setdefault("agent_errors", {})
-    params["execution_type"] = plan.get("execution_type")
+
+    # 🔥 CRITICAL FIX
+    is_tracking = plan.get("execution_type") in ["tracked_goal", "tracking"]
+
+    if is_tracking:
+        params["execution_type"] = "tracking"   # MUST MATCH CRON FILTER
+        params.setdefault("last_completed", None)
+    else:
+        params["execution_type"] = plan.get("execution_type")
+
     params["schedule"] = plan.get("schedule")
 
     # ---------------- EXECUTION ----------------
@@ -104,7 +95,9 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         agents=agents,
         params=params,
         requires_approval=requires_approval,
-        status="awaiting_approval" if requires_approval else "created",
+        status="active" if is_tracking else (
+            "awaiting_approval" if requires_approval else "created"
+        ),
         estimated_tokens=tokens,
         estimated_cost=cost
     )
@@ -117,7 +110,11 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message=f"Execution created (Est. cost: ${cost})"
+            message=(
+                "Tracking execution activated"
+                if is_tracking
+                else f"Execution created (Est. cost: ${cost})"
+            )
         )
     )
     db.commit()
