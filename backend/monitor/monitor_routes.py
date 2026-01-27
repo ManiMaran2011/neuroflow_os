@@ -30,12 +30,12 @@ def verify_system_token(authorization: str = Header(...)):
 def run_daily_monitor(db: Session = Depends(get_db)):
     """
     Runs daily monitoring for all ACTIVE tracking executions.
-    Called by cron (Render / GitHub Actions).
+    Triggered by Render cron.
     """
 
     today = datetime.utcnow().date().isoformat()
 
-    # 🔍 Fetch only ACTIVE executions
+    # 🔍 Fetch ACTIVE tracking executions
     executions = (
         db.query(Execution)
         .filter(Execution.status == "active")
@@ -53,31 +53,67 @@ def run_daily_monitor(db: Session = Depends(get_db)):
 
         last_completed = params.get("last_completed")
 
-        # ✅ Already done today → no action
+        # ✅ Already completed today → no reminder
         if last_completed == today:
             results.append({
                 "execution_id": execution.id,
-                "status": "already_completed"
+                "status": "already_completed_today"
             })
             continue
 
-        # 🔔 SEND REMINDER
+        # --------------------------------
+        # 📧 ACTIONABLE EMAIL (MARK DONE)
+        # --------------------------------
+        base_url = "https://neuroflow-os.onrender.com"
+
+        mark_done_url = (
+            f"{base_url}/executions/"
+            f"{execution.id}/mark-done"
+        )
+
+        subject = "🧠 NeuroFlow Daily Check-in"
+
+        body = f"""
+        <p>Hey 👋</p>
+
+        <p><strong>Did you complete today’s goal?</strong></p>
+
+        <p>
+          <a href="{mark_done_url}"
+             style="
+               display:inline-block;
+               padding:12px 18px;
+               background:#16a34a;
+               color:white;
+               text-decoration:none;
+               border-radius:8px;
+               font-weight:600;
+             ">
+             ✅ Mark Done
+          </a>
+        </p>
+
+        <p style="margin-top:12px;color:#666;font-size:14px;">
+          Click once to log your progress and earn XP ⚡
+        </p>
+
+        <p style="margin-top:20px;">
+          — NeuroFlow OS
+        </p>
+        """
+
+        # 🔔 SEND EMAIL
         send_email(
             to_email=execution.user_email,
-            subject="NeuroFlow Reminder ⏰",
-            body=(
-                "Hey 👋\n\n"
-                "You haven’t completed today’s task yet.\n\n"
-                "Open NeuroFlow and tap **Mark Done** to earn XP ⚡\n\n"
-                "— NeuroFlow OS"
-            )
+            subject=subject,
+            body=body
         )
 
         # 🧠 TIMELINE LOG
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message="Daily reminder sent by MonitorAgent"
+                message="Daily progress check-in email sent"
             )
         )
 
