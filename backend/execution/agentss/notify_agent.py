@@ -2,30 +2,50 @@ from backend.utils.email import send_email
 
 
 class NotifyAgent:
-    async def run(self, user_input: str, params: dict):
-        """
-        Sends an email notification (used by MonitorAgent decisions)
-        """
+    """
+    Sends real-world notifications (email).
+    Used by MonitorAgent for daily progress check-ins.
+    """
 
+    async def run(self, user_input: str, params: dict):
         user_email = params.get("user_email")
-        message = params.get("message", "")
+        goal_id = params.get("goal_id")
         reason = params.get("reason", "")
 
-        if not user_email:
+        if not user_email or not goal_id:
             return {
                 "status": "error",
-                "effect": "missing_user",
-                "summary": "No user email provided",
+                "summary": "Missing user_email or goal_id",
             }
 
-        subject = "🔔 NeuroFlow Progress Check-in"
-        body = (
-            "Hey 👋\n\n"
-            f"{message}\n\n"
-            f"Reason: {reason}\n\n"
-            "You’ve got this 💪\n\n"
-            "— NeuroFlow OS"
+        base_url = "https://neuroflow-os.onrender.com"
+
+        yes_url = (
+            f"{base_url}/progress/yes"
+            f"?goal_id={goal_id}&email={user_email}"
         )
+        no_url = (
+            f"{base_url}/progress/no"
+            f"?goal_id={goal_id}&email={user_email}"
+        )
+
+        subject = "🧠 NeuroFlow Daily Check-in"
+        body = f"""
+        <p>Hey 👋</p>
+
+        <p><strong>Did you complete today’s goal?</strong></p>
+
+        <p>
+          <a href="{yes_url}">✅ Yes</a><br/>
+          <a href="{no_url}">❌ No</a>
+        </p>
+
+        <p style="color: #666; font-size: 12px;">
+          {reason}
+        </p>
+
+        <p>— NeuroFlow OS</p>
+        """
 
         try:
             send_email(
@@ -36,7 +56,7 @@ class NotifyAgent:
 
             return {
                 "status": "success",
-                "effect": "notification_sent",
+                "effect": "daily_checkin_sent",
                 "channel": "email",
                 "to": user_email,
             }
@@ -47,6 +67,7 @@ class NotifyAgent:
                 "effect": "email_failed",
                 "error": str(e),
             }
+
 
 
 

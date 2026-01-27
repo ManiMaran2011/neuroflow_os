@@ -80,6 +80,15 @@ class UserStreak(Base):
     last_active_date = Column(DateTime, nullable=True)
 
 
+class ProgressCheckIn(Base):
+    __tablename__ = "progress_checkins"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_email = Column(String, index=True)
+    goal_id = Column(String, index=True)
+
+    date = Column(DateTime, default=datetime.utcnow)
+    completed = Column(Boolean)  # True = Yes, False = No
 
 
 
