@@ -3,6 +3,7 @@ from backend.agents.notification_agent import NotificationAgent
 from backend.agents.task_agent import TaskAgent
 from backend.agents.report_agent import ReportAgent
 from backend.agents.xp_agent import XPAgent
+from backend.execution.agentss.notify_agent import NotifyAgent
 
 
 AGENT_REGISTRY = {
@@ -11,6 +12,7 @@ AGENT_REGISTRY = {
     "TaskAgent": TaskAgent,
     "ReportAgent": ReportAgent,
     "XPAgent": XPAgent,
+    "NotifyAgent": NotifyAgent,
 }
 
 
