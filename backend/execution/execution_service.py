@@ -24,12 +24,12 @@ def resolve_agents(plan: dict) -> list[str]:
     execution_type = plan.get("execution_type")
     channel = plan.get("execution_channel")
 
-    # ---- TRACKED / HABIT / FITNESS ----
+    # ---- TRACKING / HABITS / FITNESS ----
     if execution_type in ["tracked_goal", "tracking"]:
         return [
-            "MonitorAgent",       # real (daily cron tracking)
+            "MonitorAgent",   # daily cron monitoring
             "ReportAgent",
-            "XPAgent"
+            "XPAgent",
         ]
 
     # ---- ONE-TIME TASK ----
@@ -44,7 +44,7 @@ def resolve_agents(plan: dict) -> list[str]:
 
 
 # ------------------------------------------------
-# CREATE EXECUTION (🔥 FIXED)
+# CREATE EXECUTION (🔥 FINAL FIX)
 # ------------------------------------------------
 def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     # ---------------- USER ----------------
@@ -73,11 +73,12 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     params.setdefault("agent_results", {})
     params.setdefault("agent_errors", {})
 
-    # 🔥 CRITICAL FIX
+    # 🔥 TRACKING DETECTION (CRITICAL)
     is_tracking = plan.get("execution_type") in ["tracked_goal", "tracking"]
 
     if is_tracking:
-        params["execution_type"] = "tracking"   # MUST MATCH CRON FILTER
+        # MUST MATCH cron filter
+        params["execution_type"] = "tracking"
         params.setdefault("last_completed", None)
     else:
         params["execution_type"] = plan.get("execution_type")
@@ -85,7 +86,10 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
     params["schedule"] = plan.get("schedule")
 
     # ---------------- EXECUTION ----------------
-    requires_approval = plan.get("requires_approval", True)
+    # 🔥 FORCE APPROVAL FOR TRACKING (demo-friendly)
+    requires_approval = True if is_tracking else plan.get(
+        "requires_approval", True
+    )
 
     execution = Execution(
         id=plan["plan_id"],
@@ -95,11 +99,9 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         agents=agents,
         params=params,
         requires_approval=requires_approval,
-        status="active" if is_tracking else (
-            "awaiting_approval" if requires_approval else "created"
-        ),
+        status="awaiting_approval" if requires_approval else "created",
         estimated_tokens=tokens,
-        estimated_cost=cost
+        estimated_cost=cost,
     )
 
     db.add(execution)
@@ -111,10 +113,10 @@ def create_execution(db: Session, user_email: str, plan: dict) -> Execution:
         ExecutionTimeline(
             execution_id=execution.id,
             message=(
-                "Tracking execution activated"
+                "Tracking execution created (awaiting approval)"
                 if is_tracking
                 else f"Execution created (Est. cost: ${cost})"
-            )
+            ),
         )
     )
     db.commit()
@@ -129,33 +131,42 @@ async def approve_execution(db: Session, execution: Execution):
     if execution.status != "awaiting_approval":
         raise ValueError(f"Execution is in '{execution.status}' state")
 
-    execution.status = "executing"
+    # 🔥 AFTER APPROVAL:
+    # - tracking → active
+    # - one-time → executing
+    is_tracking = execution.params.get("execution_type") == "tracking"
+
+    execution.status = "active" if is_tracking else "executing"
     db.commit()
 
     db.add(
         ExecutionTimeline(
             execution_id=execution.id,
-            message="Execution approved by user"
+            message="Execution approved by user",
         )
     )
     db.commit()
 
-    parent_agent = ParentAgent()
+    # ---- RUN AGENTS FOR NON-TRACKING ----
+    if not is_tracking:
+        parent_agent = ParentAgent()
 
-    result = await parent_agent.handle(
-        db=db,
-        execution=execution,
-        execution_plan={
-            "intent": execution.intent,
-            "actions": execution.actions,
-            "agents": execution.agents,
-            "params": execution.params
-        },
-        user_input=execution.params.get("raw_input")
-    )
+        result = await parent_agent.handle(
+            db=db,
+            execution=execution,
+            execution_plan={
+                "intent": execution.intent,
+                "actions": execution.actions,
+                "agents": execution.agents,
+                "params": execution.params,
+            },
+            user_input=execution.params.get("raw_input"),
+        )
 
-    execution.status = "executed"
-    db.commit()
+        execution.status = "executed"
+        db.commit()
+    else:
+        result = {"status": "tracking_activated"}
 
     # ---------------- XP ----------------
     user = db.query(User).filter(User.email == execution.user_email).first()
@@ -168,20 +179,21 @@ async def approve_execution(db: Session, execution: Execution):
         db.add(
             ExecutionTimeline(
                 execution_id=execution.id,
-                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})"
+                message=f"XP awarded: +{xp_awarded} (Total XP: {user.xp})",
             )
         )
         db.commit()
 
     return {
-        "status": "executed",
+        "status": execution.status,
         "execution_id": execution.id,
         "result": result,
         "xp_awarded": xp_awarded,
         "total_xp": user.xp if user else None,
         "estimated_tokens": execution.estimated_tokens,
-        "estimated_cost": execution.estimated_cost
+        "estimated_cost": execution.estimated_cost,
     }
+
 
 
 
